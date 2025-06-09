@@ -1,0 +1,99 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Repositories.DBContext;
+using Repositories.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Repositories
+{
+    public class RegisteredUserRepository
+    {
+        private readonly AichatbotDbContext dbContext;
+
+        public RegisteredUserRepository()
+        {
+        dbContext = new AichatbotDbContext();
+        }
+
+        public void CreateAccount(RegisteredUser account)
+        {
+            // Kiểm tra xem email đã tồn tại chưa
+            var existingAccount = dbContext.RegisteredUsers.FirstOrDefault(a => a.UserEmail == account.UserEmail);
+            if (existingAccount != null)
+            {
+                throw new Exception("Email đã được sử dụng.");
+            }
+
+            int newUserIdInt = 1;
+
+            if (dbContext.RegisteredUsers.Any())
+            {
+                // Lấy UserId về dưới dạng IEnumerable để xử lý bằng LINQ in-memory
+                var maxId = dbContext.RegisteredUsers
+                    .AsEnumerable() // Chuyển sang in-memory LINQ
+                    .Select(u =>
+                    {
+                        return int.TryParse(u.UserId, out int id) ? id : 0;
+                    })
+                    .Max();
+
+                newUserIdInt = maxId + 1;
+            }
+
+            // Gán lại UserId mới (chuyển thành chuỗi)
+            account.UserId = "USR" + newUserIdInt.ToString("D3"); // ví dụ: "001", "002"
+            account.UserStatus = "Active"; // Gán trạng thái mặc định là "Active"
+            dbContext.RegisteredUsers.Add(account);
+            dbContext.SaveChanges();
+        }
+
+        public void UpdateAccount(RegisteredUser c)
+        {
+            var local = dbContext.RegisteredUsers.Local.FirstOrDefault(a => a.UserId == c.UserId);
+            if (local != null)
+            {
+                dbContext.Entry(local).State = EntityState.Detached;
+            }
+            dbContext.RegisteredUsers.Update(c);
+            dbContext.SaveChanges();
+        }
+
+        public RegisteredUser GetById(string id)
+        {
+
+            return dbContext.RegisteredUsers.SingleOrDefault(p => p.UserId.Equals(id));
+
+        }
+
+
+        public void DeleteAccount(string id)
+        {
+            var account = GetById(id)
+                ?? dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+
+            if (account != null)
+            {
+                account.UserStatus = "Banned"; // Chuyển trạng thái thành "Banned"
+
+                dbContext.RegisteredUsers.Update(account); // Đánh dấu để cập nhật
+                dbContext.SaveChanges();
+            }
+        }
+
+        public List<RegisteredUser> GetAll()
+        {
+
+            return dbContext.RegisteredUsers.ToList();
+        }
+
+        public RegisteredUser Login(string email, string passwrod)
+        {
+            return dbContext.RegisteredUsers.FirstOrDefault(a => a.UserEmail.Equals(email) && a.Password.Equals(passwrod));
+
+        }
+
+    }
+}
