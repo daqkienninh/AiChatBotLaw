@@ -1,4 +1,4 @@
-.login-page {
+.register-page {
   min-height: 100vh;
   background-color: #f7f8f3;
   display: flex;
@@ -6,7 +6,7 @@
   padding: 2rem 0;
 }
 
-.login-container {
+.register-container {
   background-color: white;
   padding: 2.5rem;
   border-radius: 12px;
@@ -67,7 +67,6 @@
   font-weight: 500 !important;
   text-transform: none !important;
   font-size: 1rem !important;
-  margin-top: 0.5rem !important;
 }
 
 .submit-button:hover {

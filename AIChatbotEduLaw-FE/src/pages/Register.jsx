@@ -6,35 +6,25 @@ import {
   TextField,
   Button,
   Divider,
+  IconButton,
 } from "@mui/material";
-import { Google } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../config/firebase";
-import "./Login.css";
+import { Google, Apple, Microsoft } from "@mui/icons-material";
+import PhoneIcon from "@mui/icons-material/Phone";
+import { Link } from "react-router-dom";
+import "./Register.css";
 
-const Login = () => {
-  const navigate = useNavigate();
+const Register = () => {
+  // const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle regular login logic here
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google login successful:", result.user);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error during Google login:", error);
-    }
+    // Handle registration logic here
   };
 
   return (
-    <Box className="login-page">
+    <Box className="register-page">
       <Container maxWidth="sm">
-        <Box className="login-container">
+        <Box className="register-container">
           <Box className="logo-section">
             <img
               src="/src/assets/edulawai.jpg"
@@ -47,7 +37,7 @@ const Login = () => {
           </Box>
 
           <Typography variant="h5" className="section-title">
-            Welcome to EduLawAI!
+            Create an account
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} className="auth-form">
@@ -59,21 +49,13 @@ const Login = () => {
               required
               className="auth-input"
             />
-            <TextField
-              fullWidth
-              label="Password"
-              variant="outlined"
-              type="password"
-              required
-              className="auth-input"
-            />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               className="submit-button"
             >
-              Login
+              Continue
             </Button>
           </Box>
 
@@ -91,7 +73,6 @@ const Login = () => {
               variant="outlined"
               startIcon={<Google />}
               className="social-button google"
-              onClick={handleGoogleLogin}
             >
               Continue with Google
             </Button>
@@ -99,9 +80,9 @@ const Login = () => {
 
           <Box className="auth-footer">
             <Typography variant="body2" color="textSecondary">
-              Don't have an account?{" "}
-              <Link to="/register" className="auth-link">
-                Sign Up
+              Already have an account?{" "}
+              <Link to="/" className="auth-link">
+                Login
               </Link>
             </Typography>
           </Box>
@@ -111,4 +92,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
