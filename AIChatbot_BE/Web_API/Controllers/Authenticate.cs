@@ -40,7 +40,8 @@ namespace Web_API.Controllers
                 return Unauthorized("Tài khoản đã bị khóa.");
             }
 
-            if (user.Password != request.Password)
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+            if (isPasswordValid)
             {
                 return Unauthorized("Mật khẩu không đúng.");
             }
