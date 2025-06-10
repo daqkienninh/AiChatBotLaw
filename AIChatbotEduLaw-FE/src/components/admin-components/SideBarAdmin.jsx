@@ -7,17 +7,25 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const SidebarAdmin = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const sidebarItems = [
-    { text: "Dashboard", icon: "📊" },
-    { text: "User Management", icon: "👤" },
-    { text: "Legal Management", icon: "📋" },
-    { text: "Clause Management", icon: "✍️" },
-    { text: "Q&A Management", icon: "⭐" },
-    { text: "Maps", icon: "🗺️" },
-    { text: "Notifications", icon: "🔔" },
+    { text: "Dashboard", icon: "📊", path: "/admin/dashboard" },
+    { text: "User Management", icon: "👤", path: "/admin/users" },
+    { text: "Legal Management", icon: "📋", path: "/admin/legal" },
+    { text: "Clause Management", icon: "✍️", path: "/admin/clause" },
+    { text: "Q&A Management", icon: "⭐", path: "/admin/qa" },
+    { text: "Maps", icon: "🗺️", path: "/admin/maps" },
+    { text: "Notifications", icon: "🔔", path: "/admin/notifications" },
   ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   return (
     <Drawer
@@ -63,7 +71,12 @@ const SidebarAdmin = () => {
             <ListItem
               button
               key={item.text}
-              sx={{ "&:hover": { backgroundColor: "#e0e0e0" } }}
+              onClick={() => handleNavigation(item.path)}
+              sx={{
+                "&:hover": { backgroundColor: "#e0e0e0" },
+                backgroundColor:
+                  location.pathname === item.path ? "#e0e0e0" : "transparent",
+              }}
             >
               <ListItemText primary={`${item.icon} ${item.text}`} />
             </ListItem>

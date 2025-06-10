@@ -42,7 +42,7 @@ const HeaderUser = () => {
     { text: "Home", href: "/home" },
     { text: "Search", href: "/laws" },
     { text: "Q&A", href: "/qa" },
-    { text: "Guide", href: "/guide" },
+    { text: "Guide", href: "/admin" },
   ];
 
   // Handle scroll effect
