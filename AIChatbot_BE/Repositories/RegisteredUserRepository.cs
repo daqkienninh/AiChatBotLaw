@@ -52,16 +52,83 @@ namespace Repositories
             dbContext.SaveChanges();
         }
 
-        public void UpdateAccount(RegisteredUser c)
+        public void UpdateAccount(string id, string newName, string newEmail, string newPassword)
         {
-            var local = dbContext.RegisteredUsers.Local.FirstOrDefault(a => a.UserId == c.UserId);
-            if (local != null)
+            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+
+            if (account == null)
             {
-                dbContext.Entry(local).State = EntityState.Detached;
+                throw new Exception("Tài khoản không tồn tại.");
             }
-            dbContext.RegisteredUsers.Update(c);
+
+            if (!string.IsNullOrWhiteSpace(newEmail))
+            {
+                var emailExists = dbContext.RegisteredUsers.Any(u => u.UserEmail == newEmail && u.UserId != id);
+                if (emailExists)
+                {
+                    throw new Exception("Email đã được sử dụng bởi tài khoản khác.");
+                }
+
+                account.UserEmail = newEmail;
+            }
+
+            // Nếu newName không rỗng thì cập nhật
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                account.UserName = newName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(newPassword))
+            {
+                account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            }
+
+            dbContext.RegisteredUsers.Update(account);
             dbContext.SaveChanges();
         }
+
+        public void UpdateAccountEmail(string id, string newEmail)
+        {
+            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+            if (account == null)
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+            // Kiểm tra xem email đã tồn tại chưa
+            var emailExists = dbContext.RegisteredUsers.Any(u => u.UserEmail == newEmail && u.UserId != id);
+            if (emailExists)
+            {
+                throw new Exception("Email đã được sử dụng bởi tài khoản khác.");
+            }
+            account.UserEmail = newEmail;
+            dbContext.RegisteredUsers.Update(account);
+            dbContext.SaveChanges();
+        }
+
+        public void UpdateAccountName(string id, string newName)
+        {
+            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+            if (account == null)
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+            account.UserName = newName;
+            dbContext.RegisteredUsers.Update(account);
+            dbContext.SaveChanges();
+        }
+
+        public void UpdateAccountPassword(string id, string newPassword)
+        {
+            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+            if (account == null)
+            {
+                throw new Exception("Tài khoản không tồn tại.");
+            }
+            account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            dbContext.RegisteredUsers.Update(account);
+            dbContext.SaveChanges();
+        }
+
 
         public RegisteredUser GetById(string id)
         {
