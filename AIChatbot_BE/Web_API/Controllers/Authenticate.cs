@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Repositories.DBContext;
 using Repositories.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Services.Implement;
 
 namespace Web_API.Controllers
 {
@@ -14,10 +16,12 @@ namespace Web_API.Controllers
     public class Authenticate : ControllerBase
     {
         private readonly AichatbotDbContext _context;
+        private readonly RegisteredUserService _registeredUserService;
 
-        public Authenticate(AichatbotDbContext context)
+        public Authenticate(AichatbotDbContext context, RegisteredUserService registeredServices)
         {
             _context = context;
+            _registeredUserService = registeredServices;
         }
 
         [HttpPost]
@@ -63,6 +67,24 @@ namespace Web_API.Controllers
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        [HttpPost("register")]
+        public IActionResult RegisterAsync([FromBody] RegisterRequest request)
+        {
+
+            try
+            {
+                 _registeredUserService.Register(request.Email, request.Password);
+                return Ok(new
+                {
+                    Message = "Đăng ký thành công."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
     }
 }

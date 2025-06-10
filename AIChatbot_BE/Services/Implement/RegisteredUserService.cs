@@ -11,7 +11,7 @@ namespace Services.Implement
 {
     public class RegisteredUserService : IRegisteredUser
     {
-        private readonly RegisteredUserRepository _registeredUserRepository;
+        private readonly RegisteredUserRepository _registeredUserRepository = new RegisteredUserRepository();
 
         public RegisteredUserService()
         {
@@ -49,6 +49,11 @@ namespace Services.Implement
         public RegisteredUser Login(string email, string password)
         {
             return _registeredUserRepository.Login(email, password);
+        }
+
+        public void Register(string email, string password)
+        {
+            _registeredUserRepository.Register(email, password);
         }
 
         public void UpdateAccount(RegisteredUser c)

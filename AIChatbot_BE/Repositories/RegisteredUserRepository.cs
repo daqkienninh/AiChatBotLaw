@@ -46,6 +46,8 @@ namespace Repositories
             // Gán lại UserId mới (chuyển thành chuỗi)
             account.UserId = "USR" + newUserIdInt.ToString("D3"); // ví dụ: "001", "002"
             account.UserStatus = "Active"; // Gán trạng thái mặc định là "Active"
+            account.Role = "User"; // Gán vai trò mặc định là "User"
+            account.CreatedAt = DateTime.Now; // Gán thời gian tạo tài khoản
             dbContext.RegisteredUsers.Add(account);
             dbContext.SaveChanges();
         }
@@ -94,6 +96,44 @@ namespace Repositories
             return dbContext.RegisteredUsers.FirstOrDefault(a => a.UserEmail.Equals(email) && a.Password.Equals(passwrod));
 
         }
+
+        public void Register(string email, string password)
+        {
+            // Kiểm tra xem email đã tồn tại chưa
+            var existingAccount = dbContext.RegisteredUsers.FirstOrDefault(a => a.UserEmail == email);
+            if (existingAccount != null)
+            {
+                throw new Exception("Email đã được sử dụng.");
+            }
+
+            int newUserIdInt = 1;
+
+            if (dbContext.RegisteredUsers.Any())
+            {
+                var maxId = dbContext.RegisteredUsers
+                    .AsEnumerable()
+                    .Select(u => int.TryParse(u.UserId?.Replace("USR", ""), out int id) ? id : 0)
+                    .Max();
+
+                newUserIdInt = maxId + 1;
+            }
+
+            var newUser = new RegisteredUser
+            {
+                UserId = "USR" + newUserIdInt.ToString("D3"),
+                UserName = "User" + newUserIdInt.ToString("D3"), // Tạo tên người dùng mặc định
+                UserEmail = email,
+                Password = BCrypt.Net.BCrypt.HashPassword(password), // Hash password bằng BCrypt
+                UserStatus = "Active",
+                Role = "User",
+                CreatedAt = DateTime.Now,
+                Questions = new List<Question>()
+            };
+
+            dbContext.RegisteredUsers.Add(newUser);
+            dbContext.SaveChanges();
+        }
+
 
     }
 }
