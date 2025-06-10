@@ -24,7 +24,7 @@ namespace Web_API.Controllers
             _registeredUserService = registeredServices;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
             var user = _context.RegisteredUsers
