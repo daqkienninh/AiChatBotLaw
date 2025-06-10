@@ -8,16 +8,18 @@ namespace Web_API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly AichatbotDbContext _context;
-        public UserController(AichatbotDbContext context)
+        
+        private readonly RegisteredUserService _registeredUserService;
+        public UserController(RegisteredUserService registeredUserService)
         {
-            _context = context;
+            _registeredUserService = registeredUserService;
         }
         [HttpGet]
         public IActionResult GetAllUsers()
         {
-            var users = _context.RegisteredUsers.ToList();
-            return Ok(users);
+            
+            return Ok(_registeredUserService.GetAllAccounts());
         }
+
     }
 }
