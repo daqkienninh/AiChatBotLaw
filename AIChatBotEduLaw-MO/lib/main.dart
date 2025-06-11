@@ -46,11 +46,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedIndex == 0 ? null : AppBar(
-        title: const Text('AI ChatBot EduLaw'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
+      appBar: _selectedIndex == 0
+          ? null
+          : AppBar(
+              title: const Text('AI ChatBot EduLaw'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
       body: Center(
         child: _pages[_selectedIndex],
       ),
@@ -104,9 +106,9 @@ class HomePage extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Header Section
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
             width: double.infinity,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
