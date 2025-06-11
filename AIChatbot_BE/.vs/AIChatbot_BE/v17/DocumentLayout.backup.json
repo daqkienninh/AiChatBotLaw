@@ -1,0 +1,198 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\controllers\\authenticate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\controllers\\authenticate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|e:\\summer25\\swd392\\aichatbot_be\\repositories\\registereduserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|solutionrelative:repositories\\registereduserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97EAB29B-09BF-4790-B122-2EBF7D4C7C0E}|Services\\Services.csproj|e:\\summer25\\swd392\\aichatbot_be\\services\\services.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{97EAB29B-09BF-4790-B122-2EBF7D4C7C0E}|Services\\Services.csproj|solutionrelative:services\\services.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97EAB29B-09BF-4790-B122-2EBF7D4C7C0E}|Services\\Services.csproj|e:\\summer25\\swd392\\aichatbot_be\\services\\interface\\iregistereduser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97EAB29B-09BF-4790-B122-2EBF7D4C7C0E}|Services\\Services.csproj|solutionrelative:services\\interface\\iregistereduser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|e:\\summer25\\swd392\\aichatbot_be\\repositories\\models\\registereduser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|solutionrelative:repositories\\models\\registereduser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|e:\\summer25\\swd392\\aichatbot_be\\repositories\\repositories.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{C20CCD87-DC32-485C-9F78-F977C774B79F}|Repositories\\Repositories.csproj|solutionrelative:repositories\\repositories.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|e:\\summer25\\swd392\\aichatbot_be\\web_api\\models\\adminaccountsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{10183C86-135C-4260-800E-E4F0A72C106A}|Web_API\\Web_API.csproj|solutionrelative:web_api\\models\\adminaccountsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Authenticate.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\Authenticate.cs",
+              "RelativeDocumentMoniker": "Web_API\\Controllers\\Authenticate.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\Authenticate.cs",
+              "RelativeToolTip": "Web_API\\Controllers\\Authenticate.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAAAYwBQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T05:38:45.847Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "Web_API\\Controllers\\UserController.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\UserController.cs",
+              "RelativeToolTip": "Web_API\\Controllers\\UserController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T05:20:33.28Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Program.cs",
+              "RelativeDocumentMoniker": "Web_API\\Program.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Program.cs",
+              "RelativeToolTip": "Web_API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T04:21:27.188Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "RegisteredUser.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\Models\\RegisteredUser.cs",
+              "RelativeDocumentMoniker": "Repositories\\Models\\RegisteredUser.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\Models\\RegisteredUser.cs",
+              "RelativeToolTip": "Repositories\\Models\\RegisteredUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T03:36:53.718Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IRegisteredUser.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Services\\Interface\\IRegisteredUser.cs",
+              "RelativeDocumentMoniker": "Services\\Interface\\IRegisteredUser.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Services\\Interface\\IRegisteredUser.cs",
+              "RelativeToolTip": "Services\\Interface\\IRegisteredUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T03:32:25.603Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Services.csproj",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Services\\Services.csproj",
+              "RelativeDocumentMoniker": "Services\\Services.csproj",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Services\\Services.csproj",
+              "RelativeToolTip": "Services\\Services.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-09T03:31:29.268Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RegisteredUserRepository.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\RegisteredUserRepository.cs",
+              "RelativeDocumentMoniker": "Repositories\\RegisteredUserRepository.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\RegisteredUserRepository.cs",
+              "RelativeToolTip": "Repositories\\RegisteredUserRepository.cs",
+              "ViewState": "AgIAADQAAAAAAAAAAADwv10AAABoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T03:12:56.668Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\appsettings.json",
+              "RelativeDocumentMoniker": "Web_API\\appsettings.json",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\appsettings.json",
+              "RelativeToolTip": "Web_API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-09T03:38:42.138Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Repositories.csproj",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\Repositories.csproj",
+              "RelativeDocumentMoniker": "Repositories\\Repositories.csproj",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Repositories\\Repositories.csproj",
+              "RelativeToolTip": "Repositories\\Repositories.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-09T03:03:40.055Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "Web_API\\Controllers\\HomeController.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "Web_API\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T03:01:57.083Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "AdminAccountSetting.cs",
+              "DocumentMoniker": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Models\\AdminAccountSetting.cs",
+              "RelativeDocumentMoniker": "Web_API\\Models\\AdminAccountSetting.cs",
+              "ToolTip": "E:\\SUMMER25\\SWD392\\AIChatbot_BE\\Web_API\\Models\\AdminAccountSetting.cs",
+              "RelativeToolTip": "Web_API\\Models\\AdminAccountSetting.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T02:58:32.49Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
