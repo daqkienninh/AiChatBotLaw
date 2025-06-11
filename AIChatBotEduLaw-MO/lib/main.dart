@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'AI ChatBot EduLaw',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
       home: const MainScreen(),
