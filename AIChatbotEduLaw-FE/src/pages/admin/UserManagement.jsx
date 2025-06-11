@@ -46,9 +46,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/User/getall`
-      );
+      const response = await axios.get("api/User/getall");
       setUsers(response.data);
     } catch (error) {
       showSnackbar("Error fetching users", "error");
@@ -107,17 +105,11 @@ const UserManagement = () => {
     try {
       if (selectedUser) {
         // Update user
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/api/users/${selectedUser._id}`,
-          formData
-        );
+        await axios.put(`api/users/${selectedUser._id}`, formData);
         showSnackbar("User updated successfully");
       } else {
         // Create user
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/users`,
-          formData
-        );
+        await axios.post("/api/users", formData);
         showSnackbar("User created successfully");
       }
       fetchUsers();
