@@ -56,22 +56,11 @@ namespace Services.Implement
             _registeredUserRepository.Register(email, password);
         }
 
-        public void UpdateAccount(string id, string newName, string newEmail, string newPassword)
+        public void UpdateAccount(RegisteredUser updatedUser)
         {
-            _registeredUserRepository.UpdateAccount(id, newName, newEmail, newPassword);
+            _registeredUserRepository.UpdateAccount(updatedUser);
         }
 
-        public void UpdateAccountName(string id, string newName)
-        {
-            _registeredUserRepository.UpdateAccountName(id, newName);
-        }
-        public void UpdateAccountEmail(string id, string newEmail)
-        {
-            _registeredUserRepository.UpdateAccountEmail(id, newEmail);
-        }
-        public void UpdateAccountPassword(string id, string newPassword)
-        {
-            _registeredUserRepository.UpdateAccountPassword(id, newPassword);
-        }
+       
     }
 }

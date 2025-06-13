@@ -52,82 +52,46 @@ namespace Repositories
             dbContext.SaveChanges();
         }
 
-        public void UpdateAccount(string id, string newName, string newEmail, string newPassword)
+        public void UpdateAccount(RegisteredUser updatedUser)
         {
-            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
+            var account = dbContext.RegisteredUsers
+                .FirstOrDefault(p => p.UserId == updatedUser.UserId);
 
             if (account == null)
-            {
                 throw new Exception("Tài khoản không tồn tại.");
-            }
 
-            if (!string.IsNullOrWhiteSpace(newEmail))
+            // Cập nhật Email nếu được truyền và khác email cũ
+            if (!string.IsNullOrWhiteSpace(updatedUser.UserEmail) &&
+                updatedUser.UserEmail != account.UserEmail)
             {
-                var emailExists = dbContext.RegisteredUsers.Any(u => u.UserEmail == newEmail && u.UserId != id);
+                var emailExists = dbContext.RegisteredUsers
+                    .Any(u => u.UserEmail == updatedUser.UserEmail && u.UserId != account.UserId);
+
                 if (emailExists)
-                {
                     throw new Exception("Email đã được sử dụng bởi tài khoản khác.");
-                }
 
-                account.UserEmail = newEmail;
+                account.UserEmail = updatedUser.UserEmail;
             }
 
-            // Nếu newName không rỗng thì cập nhật
-            if (!string.IsNullOrWhiteSpace(newName))
+            // Cập nhật Name nếu có
+            if (!string.IsNullOrWhiteSpace(updatedUser.UserName))
             {
-                account.UserName = newName;
+                account.UserName = updatedUser.UserName;
             }
 
-            if (!string.IsNullOrWhiteSpace(newPassword))
+            // Cập nhật Password nếu có
+            if (!string.IsNullOrWhiteSpace(updatedUser.Password))
             {
-                account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                account.Password = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
             }
+
+            // (Không thay đổi Role, Status, CreatedAt nếu không cần)
 
             dbContext.RegisteredUsers.Update(account);
             dbContext.SaveChanges();
         }
 
-        public void UpdateAccountEmail(string id, string newEmail)
-        {
-            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
-            if (account == null)
-            {
-                throw new Exception("Tài khoản không tồn tại.");
-            }
-            // Kiểm tra xem email đã tồn tại chưa
-            var emailExists = dbContext.RegisteredUsers.Any(u => u.UserEmail == newEmail && u.UserId != id);
-            if (emailExists)
-            {
-                throw new Exception("Email đã được sử dụng bởi tài khoản khác.");
-            }
-            account.UserEmail = newEmail;
-            dbContext.RegisteredUsers.Update(account);
-            dbContext.SaveChanges();
-        }
 
-        public void UpdateAccountName(string id, string newName)
-        {
-            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
-            if (account == null)
-            {
-                throw new Exception("Tài khoản không tồn tại.");
-            }
-            account.UserName = newName;
-            dbContext.RegisteredUsers.Update(account);
-            dbContext.SaveChanges();
-        }
-
-        public void UpdateAccountPassword(string id, string newPassword)
-        {
-            var account = dbContext.RegisteredUsers.FirstOrDefault(p => p.UserId == id);
-            if (account == null)
-            {
-                throw new Exception("Tài khoản không tồn tại.");
-            }
-            account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            dbContext.RegisteredUsers.Update(account);
-            dbContext.SaveChanges();
-        }
 
 
         public RegisteredUser GetById(string id)
