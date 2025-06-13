@@ -10,10 +10,7 @@ namespace Services.Interface
     public interface IRegisteredUser
     {
         void CreateAccount(RegisteredUser account);
-        void UpdateAccount(string id, string newName, string newEmail, string newPassword);
-        void UpdateAccountName(string id, string newName);
-        void UpdateAccountEmail(string id, string newEmail);
-        void UpdateAccountPassword(string id, string newPassword);
+        void UpdateAccount(RegisteredUser updatedUser);
         void DeleteAccount(string userId);
         RegisteredUser GetAccountById(string userId);
         List<RegisteredUser> GetAllAccounts();

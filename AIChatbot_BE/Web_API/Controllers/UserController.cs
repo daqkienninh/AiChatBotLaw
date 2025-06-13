@@ -15,14 +15,14 @@ namespace Web_API.Controllers
         {
             _registeredUserService = registeredUserService;
         }
-        [HttpGet("getall")]
+        [HttpGet]
         public IActionResult GetAllUsers()
         {
             
             return Ok(_registeredUserService.GetAllAccounts());
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete]
         public IActionResult Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -34,35 +34,26 @@ namespace Web_API.Controllers
             return Ok("User deleted successfully.");
         }
 
-        [HttpPut("update")]
-        public IActionResult Update(string id, string newName, string newEmail, string newPassword)
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, [FromBody] UpdateUserDTO dto)
         {
-            
-            _registeredUserService.UpdateAccount(id, newName, newEmail, newPassword);
-            return Ok("User updated successfully.");
+            if (dto == null)
+                return BadRequest("Invalid update data");
+
+            var updatedUser = new RegisteredUser
+            {
+                UserId = id,
+                UserName = dto.UserName,
+                UserEmail = dto.UserEmail,
+                Password = dto.Password
+            };
+
+            _registeredUserService.UpdateAccount(updatedUser);
+            return Ok("Cập nhật thành công");
         }
 
-        [HttpPut("updatename")]
-        public IActionResult Update(string id, string newName)
-        {
-            _registeredUserService.UpdateAccountName(id, newName);
-            return Ok("User updated successfully.");
-        }
 
-        [HttpPut("updateemail")]
-        public IActionResult UpdateEmail(string id, string newEmail)
-        {
-            _registeredUserService.UpdateAccountEmail(id, newEmail);
-            return Ok("User email updated successfully.");
-        }
-        [HttpPut("updatepassword")]
-        public IActionResult UpdatePassword(string id, string newPassword)
-        {
-            _registeredUserService.UpdateAccountPassword(id, newPassword);
-            return Ok("User password updated successfully.");
-        }
-
-        [HttpPost("create")]
+        [HttpPost]
         public IActionResult Create(RegisteredUser account)
         {
             if (account == null)
