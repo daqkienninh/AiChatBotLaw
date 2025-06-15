@@ -45,7 +45,8 @@ namespace Web_API.Controllers
                 UserId = id,
                 UserName = dto.UserName,
                 UserEmail = dto.UserEmail,
-                Password = dto.Password
+                Password = dto.Password,
+                image = dto.Image ?? null // Nếu Image là null, gán giá trị null
             };
 
             _registeredUserService.UpdateAccount(updatedUser);

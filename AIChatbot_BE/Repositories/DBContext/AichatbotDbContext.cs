@@ -125,6 +125,9 @@ public partial class AichatbotDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("password");
+            entity.Property(e => e.image)
+                .HasMaxLength(255)
+                .HasColumnName("image");
         });
 
         OnModelCreatingPartial(modelBuilder);
