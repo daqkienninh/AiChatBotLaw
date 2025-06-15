@@ -85,6 +85,12 @@ namespace Repositories
                 account.Password = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
             }
 
+            // Cập nhật Image nếu có
+            if(!string.IsNullOrWhiteSpace(updatedUser.image))
+            {
+                account.image = updatedUser.image;
+            }
+
             // (Không thay đổi Role, Status, CreatedAt nếu không cần)
 
             dbContext.RegisteredUsers.Update(account);
