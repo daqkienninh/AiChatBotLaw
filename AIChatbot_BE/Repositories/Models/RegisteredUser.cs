@@ -13,6 +13,8 @@ public partial class RegisteredUser
 
     public string Password { get; set; } = null!;
 
+    public string? image { get; set; } = null!;
+
     public string? UserStatus { get; set; }
 
     public string? Role { get; set; }

@@ -50,11 +50,11 @@ using (var scope = app.Services.CreateScope())
 
         dbContext.RegisteredUsers.Add(admin);
         dbContext.SaveChanges();
-        Console.WriteLine("✅ Admin account created.");
+        Console.WriteLine("Admin account created!");
     }
     else
     {
-        Console.WriteLine("ℹ️ Admin account already exists.");
+        Console.WriteLine("Admin account already exists!");
     }
 }
 

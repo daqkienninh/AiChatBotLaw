@@ -7,6 +7,7 @@ CREATE TABLE Registered_user (
     user_name NVARCHAR(100) NOT NULL,
     user_email VARCHAR(100) NOT NULL UNIQUE,
 	Password NVARCHAR(255),
+	image VARCHAR(255),
     user_status VARCHAR(50),             -- active / inactive / banned
     role VARCHAR(50),                    -- admin / user / moderator
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
