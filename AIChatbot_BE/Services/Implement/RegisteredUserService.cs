@@ -60,7 +60,5 @@ namespace Services.Implement
         {
             _registeredUserRepository.UpdateAccount(updatedUser);
         }
-
-       
     }
 }

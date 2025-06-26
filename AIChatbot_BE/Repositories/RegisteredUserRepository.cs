@@ -97,16 +97,10 @@ namespace Repositories
             dbContext.SaveChanges();
         }
 
-
-
-
         public RegisteredUser GetById(string id)
         {
-
             return dbContext.RegisteredUsers.SingleOrDefault(p => p.UserId.Equals(id));
-
         }
-
 
         public void DeleteAccount(string id)
         {
@@ -170,7 +164,5 @@ namespace Repositories
             dbContext.RegisteredUsers.Add(newUser);
             dbContext.SaveChanges();
         }
-
-
     }
 }
