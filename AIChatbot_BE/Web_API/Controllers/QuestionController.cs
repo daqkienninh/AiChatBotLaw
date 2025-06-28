@@ -61,7 +61,5 @@ namespace Web_API.Controllers
             _repository.DeleteQuestion(id);
             return Ok($"Question with ID: {id} deleted!");
         }
-
-
     }
 }
