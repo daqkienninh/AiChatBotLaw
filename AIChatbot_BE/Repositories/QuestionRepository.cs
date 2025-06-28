@@ -66,5 +66,11 @@ namespace Repositories
                 .Include(q => q.User)
                 .FirstOrDefault(q => q.QuestionId == questionId);
         }
+
+        //hàm kiểm tra user có tồn tại hay không
+        public bool UserExists(string userId)
+        {
+            return dbContext.RegisteredUsers.Any(u => u.UserId == userId);
+        }
     }
 }

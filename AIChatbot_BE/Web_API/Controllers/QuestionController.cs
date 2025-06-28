@@ -39,6 +39,9 @@ namespace Web_API.Controllers
             if (dto == null || string.IsNullOrWhiteSpace(dto.QuestionContent))
                 return BadRequest("Invalid question data!");
 
+            if (!_repository.UserExists(dto.UserId))
+                return BadRequest($"Cannot send question because user with id: {dto.UserId} does not exist!");
+
             var question = new Question
             {
                 UserId = dto.UserId,
@@ -58,5 +61,7 @@ namespace Web_API.Controllers
             _repository.DeleteQuestion(id);
             return Ok($"Question with ID: {id} deleted!");
         }
+
+
     }
 }
