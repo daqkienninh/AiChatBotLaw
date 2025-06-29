@@ -15,7 +15,6 @@ namespace Services.Interface
         RegisteredUser GetAccountById(string userId);
         List<RegisteredUser> GetAllAccounts();
         RegisteredUser Login(string email, string password);
-
         void Register(string email, string password); // Optional: if you want to have a separate method for registration
     }
 }

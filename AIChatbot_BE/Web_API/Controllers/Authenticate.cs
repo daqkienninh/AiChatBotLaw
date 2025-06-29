@@ -32,18 +32,18 @@ namespace Web_API.Controllers
 
             if (user == null)
             {
-                return NotFound("Tài khoản không tồn tại.");
+                return NotFound("This account is not existed!");
             }
 
             if (user.UserStatus == "Banned")
             {
-                return Unauthorized("Tài khoản đã bị khóa.");
+                return Unauthorized("This account is banned!");
             }
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
             if (isPasswordValid)
             {
-                return Unauthorized("Mật khẩu không đúng.");
+                return Unauthorized("Password is not correct!");
             }
 
             // Nếu muốn trả về thông tin cơ bản (không bao gồm password)
@@ -79,7 +79,7 @@ namespace Web_API.Controllers
                  _registeredUserService.Register(request.Email, request.Password);
                 return Ok(new
                 {
-                    Message = "Đăng ký thành công."
+                    Message = "Register successfully!"
                 });
             }
             catch (Exception ex)
