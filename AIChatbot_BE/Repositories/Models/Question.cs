@@ -13,6 +13,8 @@ public partial class Question
 
     public DateTime? QuesCreateAt { get; set; }
 
+    public string? Embedding { get; set; }
+
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
     public virtual RegisteredUser? User { get; set; }

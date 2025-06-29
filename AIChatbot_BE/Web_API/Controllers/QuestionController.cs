@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Repositories.Models;
+using Services.Implement;
+using Services.Interface;
+using System.Text.Json;
 
 namespace Web_API.Controllers
 {
@@ -8,17 +11,19 @@ namespace Web_API.Controllers
     [Route("api/[controller]")]
     public class QuestionController : ControllerBase
     {
-        private readonly QuestionRepository _repository;
+        private readonly IQuestion _questionService;
+        private readonly IEmbeddingService _embeddingService;
 
-        public QuestionController()
+        public QuestionController(IQuestion questionService, IEmbeddingService embeddingService)
         {
-            _repository = new QuestionRepository();
+            _questionService = questionService;
+            _embeddingService = embeddingService; // Assuming you have an EmbeddingService implementation
         }
 
         [HttpGet("{id}")]
         public IActionResult GetQuestionById(string id)
         {
-            var question = _repository.GetQuestionById(id);
+            var question = _questionService.GetQuestionById(id);
 
             if (question == null)
                 return NotFound($"Question with ID: {id} is deleted or not existed!");
@@ -36,29 +41,32 @@ namespace Web_API.Controllers
         [HttpPost]
         public IActionResult CreateQuestion([FromBody] CreateQuestionDTO dto)
         {
+            var embedding = _embeddingService.GenerateEmbeddingAsync(dto.QuestionContent);
+
             if (dto == null || string.IsNullOrWhiteSpace(dto.QuestionContent))
                 return BadRequest("Invalid question data!");
 
-            if (!_repository.UserExists(dto.UserId))
-                return BadRequest($"Cannot send question because user with id: {dto.UserId} does not exist!");
+            //if (!_questionService.)
+            //    return BadRequest($"Cannot send question because user with id: {dto.UserId} does not exist!");
 
             var question = new Question
             {
                 UserId = dto.UserId,
                 QuestionContent = dto.QuestionContent,
-                QuesCreateAt = DateTime.Now
+                QuesCreateAt = DateTime.Now,
+                Embedding = JsonSerializer.Serialize(embedding)
             };
-            _repository.CreateQuestion(question);
+            _questionService.CreateQuestion(question);
             return CreatedAtAction(nameof(GetQuestionById), new { id = question.QuestionId }, question);
         }
 
         [HttpDelete("{id}")]
         public IActionResult DeleteQuestion(string id)
         {
-            var existingQuestion = _repository.GetQuestionById(id);
+            var existingQuestion = _questionService.GetQuestionById(id);
             if (existingQuestion == null)
                 return NotFound("Question not found!");
-            _repository.DeleteQuestion(id);
+            _questionService.DeleteQuestion(id);
             return Ok($"Question with ID: {id} deleted!");
         }
     }

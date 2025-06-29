@@ -12,5 +12,6 @@ namespace Repositories.Models
         public string UserId { get; set; }
         public string QuestionContent { get; set; }
         public DateTime? QuesCreateAt { get; set; }
+        public string? Embedding { get; set; }
     }
 }
