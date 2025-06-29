@@ -39,20 +39,18 @@ namespace Web_API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateQuestion([FromBody] CreateQuestionDTO dto)
+        public IActionResult CreateQuestion(string userId, [FromBody] string questionContent)
         {
-            var embedding = _embeddingService.GenerateEmbeddingAsync(dto.QuestionContent);
-
-            if (dto == null || string.IsNullOrWhiteSpace(dto.QuestionContent))
+            if (questionContent == null)
+            {
                 return BadRequest("Invalid question data!");
-
-            //if (!_questionService.)
-            //    return BadRequest($"Cannot send question because user with id: {dto.UserId} does not exist!");
+            }
+            var embedding = _embeddingService.GenerateEmbeddingAsync(questionContent);
 
             var question = new Question
             {
-                UserId = dto.UserId,
-                QuestionContent = dto.QuestionContent,
+                UserId = userId,
+                QuestionContent = questionContent,
                 QuesCreateAt = DateTime.Now,
                 Embedding = JsonSerializer.Serialize(embedding)
             };
