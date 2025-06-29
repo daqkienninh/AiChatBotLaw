@@ -61,7 +61,8 @@ namespace Web_API.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, user.UserEmail)
+            new Claim(ClaimTypes.Name, user.UserEmail),
+            new Claim("userId", user.UserId.ToString())
         }),
                 Expires = DateTime.UtcNow.AddHours(1), // Token hết hạn sau 1 giờ
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
