@@ -12,7 +12,6 @@ public partial class RegisteredUser
     public string UserEmail { get; set; } = null!;
 
     public string Password { get; set; } = null!;
-    public string? image { get; set; } = null!;
 
     public string? image { get; set; } = null!;
 
