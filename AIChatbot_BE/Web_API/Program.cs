@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddScoped<IQuestion, QuestionService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
+builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
 

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Repositories.Models;
 using Services.Interface;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,13 +13,10 @@ public class OpenAIEmbeddingService : IEmbeddingService
     private readonly string _model;
     private readonly int _maxRetries = 3;
 
-    public OpenAIEmbeddingService(IConfiguration configuration)
+    public OpenAIEmbeddingService(IOptions<OpenAIOptions> options)
     {
-        _apiKey = configuration["OpenAI:ApiKey"];
-        _model = configuration["OpenAI:EmbeddingModel"] ?? "text-embedding-ada-002";
-
-        if (string.IsNullOrEmpty(_apiKey))
-            throw new ArgumentException("OpenAI API key is missing in configuration.");
+        _apiKey = options.Value.ApiKey ?? throw new Exception("Missing OpenAI API key");
+        _model = options.Value.EmbeddingModel ?? "text-embedding-ada-002";
 
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization =
