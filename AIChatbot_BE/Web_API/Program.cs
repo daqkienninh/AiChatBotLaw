@@ -102,6 +102,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+Console.WriteLine($"🧪 API KEY from env: {builder.Configuration["OpenAI:ApiKey"]}");
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
