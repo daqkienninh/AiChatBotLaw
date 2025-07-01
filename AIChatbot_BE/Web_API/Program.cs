@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<RegisteredUserService>();
+builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
 
