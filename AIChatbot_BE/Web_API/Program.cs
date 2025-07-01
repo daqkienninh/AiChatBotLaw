@@ -12,10 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-builder.Services.AddScoped<RegisteredUserService>();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
+builder.Services.AddScoped<IQuestion, QuestionService>();
+builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
 
