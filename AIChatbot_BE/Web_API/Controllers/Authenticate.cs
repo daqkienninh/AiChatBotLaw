@@ -29,8 +29,7 @@ namespace Web_API.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = _context.RegisteredUsers
-                .FirstOrDefault(u => u.UserEmail == request.Email);
+            var user = _registeredUserService.GetAccountByEmail(request.Email);
 
             if (user == null)
             {
