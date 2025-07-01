@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Services.Implement;
+using Services.Interface;
 
 namespace Web_API.Controllers
 {
@@ -16,9 +17,10 @@ namespace Web_API.Controllers
     public class Authenticate : ControllerBase
     {
         private readonly AichatbotDbContext _context;
-        private readonly RegisteredUserService _registeredUserService;
+        private readonly IRegisteredUser _registeredUserService;
 
-        public Authenticate(AichatbotDbContext context, RegisteredUserService registeredServices)
+
+        public Authenticate(AichatbotDbContext context, IRegisteredUser registeredServices)
         {
             _context = context;
             _registeredUserService = registeredServices;
