@@ -30,6 +30,11 @@ namespace Services.Implement
             _registeredUserRepository.DeleteAccount(userId);
         }
 
+        public RegisteredUser GetAccountByEmail(string email)
+        {
+            return _registeredUserRepository.GetByEmail(email);
+        }
+
         public RegisteredUser GetAccountById(string userId)
         {
             if (string.IsNullOrEmpty(userId))
@@ -44,11 +49,6 @@ namespace Services.Implement
         {
             var result = _registeredUserRepository.GetAll();
             return result;
-        }
-
-        public RegisteredUser Login(string email, string password)
-        {
-            return _registeredUserRepository.Login(email, password);
         }
 
         public void Register(string email, string password)

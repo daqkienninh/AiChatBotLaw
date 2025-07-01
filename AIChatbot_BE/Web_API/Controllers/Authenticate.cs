@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Services.Implement;
+using Services.Interface;
 
 namespace Web_API.Controllers
 {
@@ -16,9 +17,10 @@ namespace Web_API.Controllers
     public class Authenticate : ControllerBase
     {
         private readonly AichatbotDbContext _context;
-        private readonly RegisteredUserService _registeredUserService;
+        private readonly IRegisteredUser _registeredUserService;
 
-        public Authenticate(AichatbotDbContext context, RegisteredUserService registeredServices)
+
+        public Authenticate(AichatbotDbContext context, IRegisteredUser registeredServices)
         {
             _context = context;
             _registeredUserService = registeredServices;
@@ -27,8 +29,7 @@ namespace Web_API.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = _context.RegisteredUsers
-                .FirstOrDefault(u => u.UserEmail == request.Email);
+            var user = _registeredUserService.GetAccountByEmail(request.Email);
 
             if (user == null)
             {
@@ -61,9 +62,9 @@ namespace Web_API.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, user.UserEmail),
-            new Claim("userId", user.UserId.ToString())
-        }),
+                    new Claim(ClaimTypes.Name, user.UserEmail),
+                    new Claim("userId", user.UserId.ToString())
+                }),
                 Expires = DateTime.UtcNow.AddHours(1), // Token hết hạn sau 1 giờ
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
             };

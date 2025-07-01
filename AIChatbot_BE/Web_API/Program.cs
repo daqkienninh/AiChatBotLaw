@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddScoped<IQuestion, QuestionService>();
