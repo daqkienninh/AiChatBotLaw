@@ -10,5 +10,7 @@ namespace Repositories.Models
     {
         public string ApiKey { get; set; } = string.Empty;
         public string EmbeddingModel { get; set; } = "text-embedding-ada-002";
+
+        public string FlaskUrl { get; set; } = "http://localhost:5000/embed"; // URL của Flask server
     }
 }

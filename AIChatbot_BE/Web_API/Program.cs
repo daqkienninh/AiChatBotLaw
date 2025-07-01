@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
@@ -15,10 +17,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddScoped<IQuestion, QuestionService>();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
+
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
+
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+    var client = new MongoClient(settings.ConnectionString);
+
+    try
+    {
+        // Gọi thử để kiểm tra kết nối
+        var databaseNames = client.ListDatabaseNames().ToList();
+        Console.WriteLine("✅ Kết nối MongoDB thành công. Các database gồm: " + string.Join(", ", databaseNames));
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("❌ Kết nối MongoDB thất bại: " + ex.Message);
+    }
+
+    return client;
+});
+
 
 builder.Services.AddCors(options =>
 {

@@ -4,6 +4,7 @@ using Repositories.Models;
 using Services.Implement;
 using Services.Interface;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Web_API.Controllers
 {
@@ -13,11 +14,13 @@ namespace Web_API.Controllers
     {
         private readonly IQuestion _questionService;
         private readonly IEmbeddingService _embeddingService;
+        private readonly IAnswerService _answerService;
 
-        public QuestionController(IQuestion questionService, IEmbeddingService embeddingService)
+        public QuestionController(IQuestion questionService, IEmbeddingService embeddingService, IAnswerService answerService)
         {
             _questionService = questionService;
             _embeddingService = embeddingService; // Assuming you have an EmbeddingService implementation
+            _answerService = answerService;
         }
 
         [HttpGet("{id}")]
@@ -39,7 +42,7 @@ namespace Web_API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateQuestion(string userId, [FromBody] string questionContent)
+        public async Task<IActionResult> CreateQuestion(string userId, [FromBody] string questionContent)
         {
             if (questionContent == null)
             {
@@ -55,6 +58,7 @@ namespace Web_API.Controllers
                 Embedding = JsonSerializer.Serialize(embedding)
             };
             _questionService.CreateQuestion(question);
+            await _answerService.CreateAnswerFromQuestionAsync(question);
             return CreatedAtAction(nameof(GetQuestionById), new { id = question.QuestionId }, question);
         }
 
