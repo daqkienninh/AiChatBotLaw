@@ -42,7 +42,7 @@ namespace Web_API.Controllers
             }
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
-            if (isPasswordValid)
+            if (isPasswordValid == true)
             {
                 return Unauthorized("Password is not correct!");
             }
