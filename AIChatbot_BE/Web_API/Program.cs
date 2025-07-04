@@ -91,12 +91,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy => policy
-            .WithOrigins("ai-chatbot-fe-web.vercel.app")
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("https://ai-chatbot-fe-web.vercel.app", "http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-    );
+            .AllowCredentials(); // Optional, if credentials are needed
+    });
 });
 
 var app = builder.Build();
