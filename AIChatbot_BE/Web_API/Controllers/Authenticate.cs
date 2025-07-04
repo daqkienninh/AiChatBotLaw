@@ -29,8 +29,7 @@ namespace Web_API.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = _context.RegisteredUsers
-                .FirstOrDefault(u => u.UserEmail == request.Email);
+            var user = _registeredUserService.GetAccountByEmail(request.Email);
 
             if (user == null)
             {
@@ -42,7 +41,8 @@ namespace Web_API.Controllers
                 return Unauthorized("This account is banned!");
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+            if (!isPasswordValid)
             {
                 return Unauthorized("Password is not correct!");
             }
@@ -62,8 +62,9 @@ namespace Web_API.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.Name, user.UserEmail)
-        }),
+                    new Claim(ClaimTypes.Name, user.UserEmail),
+                    new Claim("userId", user.UserId.ToString())
+                }),
                 Expires = DateTime.UtcNow.AddHours(1), // Token hết hạn sau 1 giờ
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
             };

@@ -9,7 +9,7 @@ namespace Services.Interface
 {
     public interface IQuestion
     {
-        void CreateQuestion(CreateQuestionDTO dto);
+        void CreateQuestion(Question question);
         void DeleteQuestion(string questionId);
         Question GetQuestionById(string questionId);
     }

@@ -82,6 +82,9 @@ public partial class AichatbotDbContext : DbContext
             entity.Property(e => e.QuestionContent)
                 .HasMaxLength(4000)
                 .HasColumnName("question_content");
+            entity.Property(e => e.Embedding)
+                .HasMaxLength(4000)
+                .HasColumnName("embedding");
             entity.Property(e => e.UserId)
                 .HasMaxLength(36)
                 .HasColumnName("user_id");
@@ -125,6 +128,9 @@ public partial class AichatbotDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("password");
+            entity.Property(e => e.image)
+                .HasMaxLength(255)
+                .HasColumnName("image");
         });
 
         OnModelCreatingPartial(modelBuilder);

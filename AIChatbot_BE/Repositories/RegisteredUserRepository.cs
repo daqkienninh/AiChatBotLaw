@@ -85,6 +85,12 @@ namespace Repositories
                 account.Password = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
             }
 
+            // Cập nhật Image nếu có
+            if(!string.IsNullOrWhiteSpace(updatedUser.image))
+            {
+                account.image = updatedUser.image;
+            }
+
             // (Không thay đổi Role, Status, CreatedAt nếu không cần)
 
             dbContext.RegisteredUsers.Update(account);
@@ -116,10 +122,9 @@ namespace Repositories
             return dbContext.RegisteredUsers.ToList();
         }
 
-        public RegisteredUser Login(string email, string passwrod)
+        public RegisteredUser GetByEmail(string email)
         {
-            return dbContext.RegisteredUsers.FirstOrDefault(a => a.UserEmail.Equals(email) && a.Password.Equals(passwrod));
-
+            return dbContext.RegisteredUsers.SingleOrDefault(a => a.UserEmail == email);
         }
 
         public void Register(string email, string password)

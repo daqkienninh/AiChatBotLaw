@@ -1,7 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+=======
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+>>>>>>> deploy_BE
 using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
@@ -14,12 +19,48 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-builder.Services.AddScoped<RegisteredUserService>();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
+builder.Services.AddScoped<IQuestion, QuestionService>();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
+builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
+
+builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
+
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+    var client = new MongoClient(settings.ConnectionString);
+
+    try
+    {
+        // Gọi thử để kiểm tra kết nối
+        var databaseNames = client.ListDatabaseNames().ToList();
+        Console.WriteLine("✅ Kết nối MongoDB thành công. Các database gồm: " + string.Join(", ", databaseNames));
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("❌ Kết nối MongoDB thất bại: " + ex.Message);
+    }
+
+    return client;
+});
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVercelFrontend",
+        policy =>
+        {
+            policy.WithOrigins("https://ai-chat-bot-law.vercel.app")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 //add google login service
 builder.Services.AddAuthentication(options =>
@@ -62,6 +103,27 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+var environment = app.Environment;
+
+// Kích hoạt Swagger trong Development hoặc Production
+if (environment.IsDevelopment() || environment.IsProduction())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.RoutePrefix = "swagger";
+    });
+
+    // Redirect từ root đến Swagger
+    app.MapGet("/", context =>
+    {
+        context.Response.Redirect("/swagger");
+        return Task.CompletedTask;
+    });
+}
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5171";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 using (var scope = app.Services.CreateScope())
 {
@@ -96,6 +158,9 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Admin account already exists!");
     }
 }
+
+Console.WriteLine($"🧪 API KEY from env: {builder.Configuration["OpenAI:ApiKey"]}");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

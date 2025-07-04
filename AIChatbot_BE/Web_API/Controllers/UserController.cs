@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Repositories.DBContext;
 using Repositories.Models;
-using Services.Implement;
+using Services.Interface;
 
 namespace Web_API.Controllers
 {
@@ -9,8 +9,8 @@ namespace Web_API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly RegisteredUserService _registeredUserService;
-        public UserController(RegisteredUserService registeredUserService)
+        private readonly IRegisteredUser _registeredUserService;
+        public UserController(IRegisteredUser registeredUserService)
         {
             _registeredUserService = registeredUserService;
         }
@@ -57,7 +57,8 @@ namespace Web_API.Controllers
                 UserId = id,
                 UserName = dto.UserName,
                 UserEmail = dto.UserEmail,
-                Password = dto.Password
+                Password = dto.Password,
+                image = dto.Image ?? null // Nếu Image là null, gán giá trị null
             };
             _registeredUserService.UpdateAccount(updatedUser);
             return Ok("Update Successfully!");
