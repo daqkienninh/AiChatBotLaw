@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Repositories;
@@ -7,7 +6,8 @@ using Repositories.DBContext;
 using Repositories.Models;
 using Services.Implement;
 using Services.Interface;
-using System;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +19,8 @@ builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddScoped<IQuestion, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
+builder.Services.AddScoped<INotification, NotificationService>();
+
 
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 
@@ -54,6 +56,33 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("https://ai-chat-bot-law.vercel.app")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
+        });
+});
+
+//add google login service
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+    .AddCookie()
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+    {
+       options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+       options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+       options.CallbackPath = "/api/GoogleAuthenticate/GoogleResponse";
+    });
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        policy =>
+        {
+            policy.WithOrigins("https://ai-chatbot-fe-web.vercel.app") // Frontend của bạn
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // Nếu bạn dùng cookie hoặc auth header
         });
 });
 
@@ -137,8 +166,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowFrontend");
-app.UseAuthorization();
+app.UseCors("AllowSpecificOrigin");
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
