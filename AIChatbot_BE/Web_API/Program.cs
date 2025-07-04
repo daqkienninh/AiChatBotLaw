@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
@@ -18,6 +20,21 @@ builder.Services.AddScoped<RegisteredUserService>();
 builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
+
+//add google login service
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+    .AddCookie()
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+    {
+       options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+       options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+       options.CallbackPath = "/api/GoogleAuthenticate/GoogleResponse";
+    });
+
 
 builder.Services.AddCors(options =>
 {
