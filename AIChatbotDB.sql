@@ -45,3 +45,12 @@ VALUES (
     'user'
 );
 
+-- tạo table notification
+CREATE TABLE Notification (
+    notification_id NVARCHAR(36) PRIMARY KEY,
+    notification_title NVARCHAR(255),
+    notification_content NVARCHAR(MAX),
+    notification_created_at DATETIME,
+    is_global BIT DEFAULT 1 -- cái này dùng để định dạng thông báo này là thông báo chung cho tất cả user
+);
+

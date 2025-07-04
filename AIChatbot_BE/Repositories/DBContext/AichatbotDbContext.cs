@@ -23,6 +23,8 @@ public partial class AichatbotDbContext : DbContext
 
     public virtual DbSet<RegisteredUser> RegisteredUsers { get; set; }
 
+    public virtual DbSet<Notification> Notifications { get; set; }
+
     private string GetConnectionString()
     {
         IConfiguration configuration = new ConfigurationBuilder()
@@ -131,6 +133,32 @@ public partial class AichatbotDbContext : DbContext
             entity.Property(e => e.image)
                 .HasMaxLength(255)
                 .HasColumnName("image");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.NotificationId);
+            entity.ToTable("Notification");
+
+            entity.Property(e => e.NotificationId)
+                .HasColumnName("notification_id")
+                .HasMaxLength(36);
+
+            entity.Property(e => e.Title)
+                .HasColumnName("notification_title")
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Content)
+                .HasColumnName("notification_content");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("notification_created_at")
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getdate())");
+
+            entity.Property(e => e.IsGlobal)
+                .HasColumnName("is_global")
+                .HasDefaultValue(true);
         });
 
         OnModelCreatingPartial(modelBuilder);
