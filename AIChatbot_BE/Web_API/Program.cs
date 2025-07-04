@@ -1,18 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-<<<<<<< HEAD
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.Cookies;
-=======
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
->>>>>>> deploy_BE
 using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
 using Services.Implement;
 using Services.Interface;
-using System;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
