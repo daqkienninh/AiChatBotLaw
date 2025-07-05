@@ -47,18 +47,6 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return client;
 });
 
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowVercelFrontend",
-        policy =>
-        {
-            policy.WithOrigins("https://ai-chat-bot-law.vercel.app")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
-
 //add google login service
 builder.Services.AddAuthentication(options =>
 {
@@ -145,8 +133,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Admin account already exists!");
     }
 }
-
-Console.WriteLine($"🧪 API KEY from env: {builder.Configuration["OpenAI:ApiKey"]}");
 
 
 // Configure the HTTP request pipeline.
