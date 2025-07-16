@@ -21,6 +21,7 @@ builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
 builder.Services.AddScoped<INotification, NotificationService>();
 
+builder.Services.AddScoped<ILegalService, LegalService>();
 
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 
@@ -46,6 +47,11 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 
     return client;
 });
+// Đăng ký như singleton để inject trực tiếp nếu cần
+builder.Services.AddSingleton(sp =>
+    builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>()
+);
+builder.Services.AddSingleton<LawRepository>();
 
 //add google login service
 builder.Services.AddAuthentication(options =>
