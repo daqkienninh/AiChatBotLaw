@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using Repositories.Models;
 using Services.Interface;
 
 namespace Web_API.Controllers
@@ -64,6 +66,30 @@ namespace Web_API.Controllers
                 return NotFound("No legal chapters found.");
             }
             return Ok(chapters);
+        }
+
+        [HttpPost("create/chapter")]
+        public async Task<IActionResult> CreateChapter(string newChapterId, string newChapterName)
+        {
+            if (newChapterId == null || newChapterName == null)
+            {
+                return BadRequest("Invalid chapter data.");
+            }
+            var newChapter = new LegalChapter
+            {
+                Id = newChapterId,
+                Title = newChapterName,
+                Clauses = new List<LegalClause>() // Khởi tạo danh sách clauses rỗng
+            };
+            var result = await _legalService.CreateChapterAsync(newChapter);
+            if (result)
+            {
+                return Ok("Chapter created successfully.");
+            }
+            else
+            {
+                return BadRequest("Failed to create chapter.");
+            }
         }
     }
 }

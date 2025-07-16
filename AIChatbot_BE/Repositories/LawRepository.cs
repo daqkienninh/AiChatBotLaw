@@ -21,11 +21,19 @@ namespace Repositories
             _settings = settings;
 
             var database = _mongoClient.GetDatabase(_settings.DatabaseName);
-            _chapterCollection = database.GetCollection<LegalDocument>("LegalDocument");
-            _bsonCollection = database.GetCollection<BsonDocument>("LegalDocument");
+            _chapterCollection = database.GetCollection<LegalDocument>("localLegalDocument");
+            _bsonCollection = database.GetCollection<BsonDocument>("localLegalDocument");
         }
 
-        // ✅ Cập nhật nội dung 1 điểm (point)
+        /// <summary>
+        /// Update Point Text by ChapterId, ClauseId, ClauseItemId and PointId
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="clauseId"></param>
+        /// <param name="clauseItemId"></param>
+        /// <param name="pointId"></param>
+        /// <param name="newText"></param>
+        /// <returns></returns>
         public async Task<bool> UpdatePointTextAsync(string chapterId, string clauseId, string clauseItemId, string pointId, string newText)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
@@ -47,7 +55,14 @@ namespace Repositories
             return result.ModifiedCount > 0;
         }
 
-        // ✅ Cập nhật nội dung khoản (clauseItem)
+        /// <summary>
+        ///  Update Clause Text by ChapterId, ClauseId and ClauseItemId
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="clauseId"></param>
+        /// <param name="clauseItemId"></param>
+        /// <param name="newText"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateClauseItemTextAsync(string chapterId, string clauseId, string clauseItemId, string newText)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
@@ -68,7 +83,13 @@ namespace Repositories
             return result.ModifiedCount > 0;
         }
 
-        // ✅ Cập nhật tiêu đề điều (clause)
+        /// <summary>
+        /// Update Articles by ChapterId and ClauseId
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="clauseId"></param>
+        /// <param name="newTitle"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateClauseTitleAsync(string chapterId, string clauseId, string newTitle)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
@@ -87,7 +108,11 @@ namespace Repositories
             var result = await _bsonCollection.UpdateOneAsync(filter, update, options);
             return result.ModifiedCount > 0;
         }
-
+        /// <summary>
+        /// Dictionary Clause by ChapterId
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <returns></returns>
         public async Task<List<Dictionary<string, string>>> GetLegalClauseByChapterIdAsync(string chapterId)
         {
             var filter = Builders<BsonDocument>.Filter.And(
@@ -120,7 +145,10 @@ namespace Repositories
             return clauseList;
         }
 
-
+        /// <summary>
+        /// Get all legal document
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<LegalChapter>> GetAllLegalChapter()
         {
             var filter = Builders<BsonDocument>.Filter.Eq("type", "CHUONG");
@@ -148,11 +176,12 @@ namespace Repositories
                         {
                             Id = articleDoc.GetValue("id", "").AsString,
                             Title = articleDoc.GetValue("title", "").AsString,
+                            Type = articleDoc.GetValue("type", "").AsString,
                             ClauseItems = new List<LegalClauseItem>()
                         };
 
                         // Nếu có clauseItems trong điều
-                        if (articleDoc.TryGetValue("clauseItems", out var clauseItemsBson) && clauseItemsBson.IsBsonArray)
+                        if (articleDoc.TryGetValue("clauses", out var clauseItemsBson) && clauseItemsBson.IsBsonArray)
                         {
                             foreach (var itemBson in clauseItemsBson.AsBsonArray)
                             {
@@ -193,6 +222,107 @@ namespace Repositories
 
             return chapters;
         }
+
+        /// <summary>
+        /// Create Chapter
+        /// </summary>
+        /// <param name="newChapter"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateChapterAsync(LegalChapter legalChapter)
+        {
+            var bsonDoc = legalChapter.ToBsonDocument(); // Chuyển từ object sang BsonDocument
+            await _bsonCollection.InsertOneAsync(bsonDoc);
+            return true;
+        }
+        /// <summary>
+        /// Create Clause
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="clauseId"></param>
+        /// <param name="newClauseItem"></param>
+        /// <returns></returns>
+        public async Task<bool> AddClauseItemAsync(string chapterId, string clauseId, BsonDocument newClauseItem)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
+
+            var update = Builders<BsonDocument>.Update.Push("articles.$[art].clauseItems", newClauseItem);
+
+            var options = new UpdateOptions
+            {
+                ArrayFilters = new List<ArrayFilterDefinition<BsonDocument>>
+        {
+            new JsonArrayFilterDefinition<BsonDocument>("{ 'art.id': '" + clauseId + "' }")
+        }
+            };
+
+            var result = await _bsonCollection.UpdateOneAsync(filter, update, options);
+            return result.ModifiedCount > 0;
+        }
+        /// <summary>
+        /// Add Point to Clause
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="clauseId"></param>
+        /// <param name="clauseItemId"></param>
+        /// <param name="newPoint"></param>
+        /// <returns></returns>
+        public async Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, BsonDocument newPoint)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
+
+            var update = Builders<BsonDocument>.Update.Push("articles.$[art].clauseItems.$[ci].points", newPoint);
+
+            var options = new UpdateOptions
+            {
+                ArrayFilters = new List<ArrayFilterDefinition<BsonDocument>>
+        {
+            new JsonArrayFilterDefinition<BsonDocument>("{ 'art.id': '" + clauseId + "' }"),
+            new JsonArrayFilterDefinition<BsonDocument>("{ 'ci.id': '" + clauseItemId + "' }")
+        }
+            };
+
+            var result = await _bsonCollection.UpdateOneAsync(filter, update, options);
+            return result.ModifiedCount > 0;
+        }
+
+        /// <summary>
+        /// Add Article to Chapter
+        /// </summary>
+        /// <param name="chapterId"></param>
+        /// <param name="newClause"></param>
+        /// <returns></returns>
+        public async Task<bool> AddClauseToChapterAsync(string chapterId, LegalClause newClause)
+        {
+            var filter = Builders<BsonDocument>.Filter.And(
+                Builders<BsonDocument>.Filter.Eq("type", "CHUONG"),
+                Builders<BsonDocument>.Filter.Eq("id", chapterId)
+            );
+
+            var newClauseBson = new BsonDocument
+            {
+                { "id", newClause.Id },
+                { "title", newClause.Title },
+                { "clause", new BsonArray(newClause.ClauseItems?.Select(item => new BsonDocument
+                    {
+                        { "id", item.Id },
+                        { "text", item.Text },
+                        { "points", new BsonArray(item.Points?.Select(p => new BsonDocument
+                            {
+                                { "id", p.Id },
+                                { "text", p.Text }
+                            }) ?? new List<BsonDocument>()) 
+                        }
+                    }) ?? new List<BsonDocument>()) 
+                }
+            };
+
+            var update = Builders<BsonDocument>.Update.Push("articles", newClauseBson);
+
+            var result = await _bsonCollection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
+        }
+
 
     }
 }
