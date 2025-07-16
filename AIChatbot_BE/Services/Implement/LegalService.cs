@@ -97,5 +97,35 @@ namespace Services.Implement
                 return new List<LegalChapter>();
             }
         }
+
+        public async Task<bool> CreateChapterAsync(LegalChapter legalChapter)
+        {
+            return await _lawRepository.CreateChapterAsync(legalChapter);
+        }
+
+        public async Task<bool> AddClauseToChapterAsync(string chapterId, LegalClause newClause)
+        {
+            return await _lawRepository.AddClauseToChapterAsync(chapterId, newClause);
+        }
+
+        public async Task<bool> AddClauseItemAsync(string chapterId, string clauseId, LegalClauseItem newClauseItem)
+        {
+            return await _lawRepository.AddClauseItemAsync(chapterId, clauseId, newClauseItem);
+        }
+
+        public async Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, LegalPoint newPoint)
+        {
+            return await _lawRepository.AddPointAsync(chapterId, clauseId, clauseItemId, newPoint);
+        }
+
+        public async Task<bool> UpdateClauseItemTextAsync(string chapterId, string clauseId, string clauseItemId, string newText)
+        {
+            return await _lawRepository.UpdateClauseItemTextAsync(chapterId, clauseId, clauseItemId, newText);
+        }
+
+        public async Task<bool> UpdatePointTextAsync(string chapterId, string clauseId, string clauseItemId, string pointId, string newText)
+        {
+            return await _lawRepository.UpdatePointTextAsync(chapterId, clauseId, clauseItemId, pointId, newText);
+        }
     }
 }

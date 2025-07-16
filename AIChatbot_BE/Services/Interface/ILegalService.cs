@@ -1,4 +1,5 @@
-﻿using Repositories.Models;
+﻿using MongoDB.Bson;
+using Repositories.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,14 @@ namespace Services.Interface
     public interface ILegalService
     {
         Task<bool> ProcessPdfAsync(string filePath);
-        Task<bool> UpdateClauseTitleAsync(string chapterId, string clauseId, string newTitle);
         Task<List<LegalChapter>> GetAllLegalChapter();
+
+        Task<bool> UpdateClauseTitleAsync(string chapterId, string clauseId, string newTitle);
+        Task<bool> UpdateClauseItemTextAsync(string chapterId, string clauseId, string clauseItemId, string newText);
+        Task<bool> UpdatePointTextAsync(string chapterId, string clauseId, string clauseItemId, string pointId, string newText);
+        Task<bool> CreateChapterAsync(LegalChapter legalChapter);
+        Task<bool> AddClauseToChapterAsync(string chapterId, LegalClause newClause);
+        Task<bool> AddClauseItemAsync(string chapterId, string clauseId, LegalClauseItem newClauseItem);
+        Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, LegalPoint newPoint);
     }
 }
