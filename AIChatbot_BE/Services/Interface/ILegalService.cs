@@ -14,9 +14,11 @@ namespace Services.Interface
         Task<List<LegalChapter>> GetAllLegalChapter();
 
         Task<bool> UpdateClauseTitleAsync(string chapterId, string clauseId, string newTitle);
+        Task<bool> UpdateClauseItemTextAsync(string chapterId, string clauseId, string clauseItemId, string newText);
+        Task<bool> UpdatePointTextAsync(string chapterId, string clauseId, string clauseItemId, string pointId, string newText);
         Task<bool> CreateChapterAsync(LegalChapter legalChapter);
         Task<bool> AddClauseToChapterAsync(string chapterId, LegalClause newClause);
-        Task<bool> AddClauseItemAsync(string chapterId, string clauseId, BsonDocument newClauseItem);
-        Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, BsonDocument newPoint);
+        Task<bool> AddClauseItemAsync(string chapterId, string clauseId, LegalClauseItem newClauseItem);
+        Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, LegalPoint newPoint);
     }
 }

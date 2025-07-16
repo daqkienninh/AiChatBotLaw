@@ -235,13 +235,13 @@ namespace Repositories
             return true;
         }
         /// <summary>
-        /// Create Clause
+        /// Add Clase to Article
         /// </summary>
         /// <param name="chapterId"></param>
         /// <param name="clauseId"></param>
         /// <param name="newClauseItem"></param>
         /// <returns></returns>
-        public async Task<bool> AddClauseItemAsync(string chapterId, string clauseId, BsonDocument newClauseItem)
+        public async Task<bool> AddClauseItemAsync(string chapterId, string clauseId, LegalClauseItem newClauseItem)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
 
@@ -266,7 +266,7 @@ namespace Repositories
         /// <param name="clauseItemId"></param>
         /// <param name="newPoint"></param>
         /// <returns></returns>
-        public async Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, BsonDocument newPoint)
+        public async Task<bool> AddPointAsync(string chapterId, string clauseId, string clauseItemId, LegalPoint newPoint)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("id", chapterId);
 
@@ -275,10 +275,10 @@ namespace Repositories
             var options = new UpdateOptions
             {
                 ArrayFilters = new List<ArrayFilterDefinition<BsonDocument>>
-        {
-            new JsonArrayFilterDefinition<BsonDocument>("{ 'art.id': '" + clauseId + "' }"),
-            new JsonArrayFilterDefinition<BsonDocument>("{ 'ci.id': '" + clauseItemId + "' }")
-        }
+                {
+                    new JsonArrayFilterDefinition<BsonDocument>("{ 'art.id': '" + clauseId + "' }"),
+                    new JsonArrayFilterDefinition<BsonDocument>("{ 'ci.id': '" + clauseItemId + "' }")
+                }
             };
 
             var result = await _bsonCollection.UpdateOneAsync(filter, update, options);
