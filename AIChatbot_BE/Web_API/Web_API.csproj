@@ -20,4 +20,10 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="PythonScripts\parse_law.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
