@@ -27,12 +27,17 @@ namespace Services.Implement
         private readonly IMongoClient _mongoClient;
         private readonly MongoDbSettings _settings;
         private readonly LawRepository _lawRepository;
+        private readonly IMongoCollection<LegalChapter> _chapterCollection;
+        private readonly IEmbeddingService _embeddingService;
 
-        public LegalService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, LawRepository lawRepository)
+        public LegalService(IMongoClient mongoClient, IOptions<MongoDbSettings> settings, LawRepository lawRepository, IEmbeddingService embeddingService)
         {
             _mongoClient = mongoClient;
             _settings = settings.Value;
             _lawRepository = lawRepository;
+            var database = _mongoClient.GetDatabase(_settings.DatabaseName);
+            _chapterCollection = database.GetCollection<LegalChapter>("localLegalChapter");
+            _embeddingService = embeddingService;
         }
 
         public Task<List<LegalChapter>> GetAllLegalChapter()
@@ -51,8 +56,12 @@ namespace Services.Implement
             // 3. Chuyển sang cây JSON
             var tree = ParseRawLinesToTree(rawLines);
 
+            if (Directory.Exists("outputs"))
+            {
+                Directory.Delete("outputs", true); // true = xóa đệ quy (bao gồm cả file và folder con)
+            }
             // 4. Gửi vào MongoDB
-            return await _lawRepository.SyncTreeAsync(tree);
+            return await SyncTreeAsync(tree);
         }
 
         public static async Task<string> ExtractTextAsync(IFormFile file)
@@ -227,6 +236,124 @@ namespace Services.Implement
         public Task<bool> UpdateClauseAsync(string chapterId, string clauseId, string? newClauseText = null, List<LegalClauseItem>? newClauseItems = null, List<LegalPoint>? newPoints = null)
         {
             return _lawRepository.UpdateClauseAsync(chapterId, clauseId, newClauseText, newClauseItems, newPoints); 
+        }
+
+        public async Task<SyncResult> SyncTreeAsync(List<LegalChapter> chapters)
+        {
+            int inserted = 0, updated = 0, skipped = 0;
+            var result = new SyncResult();
+
+            foreach (var newChapter in chapters)
+            {
+                var existingChapter = await _chapterCollection
+                    .Find(c => c.Type == "CHUONG" && c.Id == newChapter.Id)
+                    .FirstOrDefaultAsync();
+
+                if (existingChapter == null)
+                {
+                    newChapter.Embedding = await _embeddingService.GenerateEmbeddingAsync(newChapter.Title);
+
+                    await _chapterCollection.InsertOneAsync(newChapter);
+                    inserted++;
+                    result.ChangeLogs.Add($"➕ Thêm mới Chương {newChapter.Id}: \"{newChapter.Title}\"");
+                    continue;
+                }
+
+                bool isDifferent = false;
+
+                if (newChapter.Title != existingChapter.Title)
+                {
+                    result.ChangeLogs.Add($"📝 Cập nhật tiêu đề Chương {newChapter.Id}: \"{existingChapter.Title}\" → \"{newChapter.Title}\"");
+                    isDifferent = true;
+                }
+
+                if (isDifferent && newChapter.Clauses?.Count == existingChapter.Clauses?.Count)
+                {
+                    for (int i = 0; i < newChapter.Clauses.Count; i++)
+                    {
+                        var newClause = newChapter.Clauses[i];
+                        var existingClause = existingChapter.Clauses[i];
+
+                        if (newClause.Id != existingClause.Id || newClause.Title != existingClause.Title)
+                        {
+                            result.ChangeLogs.Add($"📝 Cập nhật Điều {existingClause.Id} trong Chương {newChapter.Id}: \"{existingClause.Title}\" → \"{newClause.Title}\"");
+                            isDifferent = true;
+                            break;
+                        }
+
+                        if (newClause.ClauseItems?.Count != existingClause.ClauseItems?.Count)
+                        {
+                            result.ChangeLogs.Add($"⚠️ Số khoản thay đổi trong Điều {newClause.Id} của Chương {newChapter.Id}");
+                            isDifferent = true;
+                            break;
+                        }
+
+                        for (int j = 0; j < newClause.ClauseItems.Count; j++)
+                        {
+                            var newItem = newClause.ClauseItems[j];
+                            var existingItem = existingClause.ClauseItems[j];
+
+                            if (newItem.Id != existingItem.Id || newItem.Text != existingItem.Text)
+                            {
+                                result.ChangeLogs.Add($"📝 Cập nhật Khoản {existingItem.Id} trong Điều {existingClause.Id} (Chương {newChapter.Id})");
+                                isDifferent = true;
+                                break;
+                            }
+
+                            if (newItem.Points?.Count != existingItem.Points?.Count)
+                            {
+                                result.ChangeLogs.Add($"⚠️ Số điểm thay đổi trong Khoản {newItem.Id} (Điều {existingClause.Id}, Chương {newChapter.Id})");
+                                isDifferent = true;
+                                break;
+                            }
+
+                            for (int k = 0; k < newItem.Points.Count; k++)
+                            {
+                                var newPoint = newItem.Points[k];
+                                var existingPoint = existingItem.Points[k];
+
+                                if (newPoint.Id != existingPoint.Id || newPoint.Text != existingPoint.Text)
+                                {
+                                    result.ChangeLogs.Add($"📝 Cập nhật Điểm {existingPoint.Id} trong Khoản {existingItem.Id} (Điều {existingClause.Id}, Chương {newChapter.Id})");
+                                    isDifferent = true;
+                                    break;
+                                }
+                            }
+
+                            if (isDifferent) break;
+                        }
+
+                        if (isDifferent) break;
+                    }
+                }
+                else if (!isDifferent)
+                {
+                    result.ChangeLogs.Add($"⚠️ Số lượng Điều thay đổi trong Chương {newChapter.Id}");
+                    isDifferent = true;
+                }
+
+                if (isDifferent)
+                {
+                    var update = Builders<LegalChapter>.Update
+                        .Set(c => c.Clauses, newChapter.Clauses)
+                        .Set(c => c.Title, newChapter.Title);
+
+                    await _chapterCollection.UpdateOneAsync(c => c.Id == newChapter.Id, update);
+                    updated++;
+                }
+                else
+                {
+                    skipped++;
+                }
+            }
+
+            result.Inserted = inserted;
+            result.Updated = updated;
+            result.Skipped = skipped;
+
+            result.ChangeLogs.Add($"✅ Hoàn tất: {inserted} chương mới, {updated} chương cập nhật, {skipped} chương giữ nguyên");
+
+            return result;
         }
     }
 }
