@@ -19,6 +19,10 @@ public partial class AichatbotDbContext : DbContext
 
     public virtual DbSet<Answer> Answers { get; set; }
 
+    public virtual DbSet<ChatRoom> ChatRooms { get; set; }
+
+    public virtual DbSet<ChatRoomQuestion> ChatRoomQuestions { get; set; }
+
     public virtual DbSet<Question> Questions { get; set; }
 
     public virtual DbSet<RegisteredUser> RegisteredUsers { get; set; }
@@ -35,6 +39,7 @@ public partial class AichatbotDbContext : DbContext
     {
         optionsBuilder.UseSqlServer(GetConnectionString());
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Answer>(entity =>
@@ -66,6 +71,42 @@ public partial class AichatbotDbContext : DbContext
                 .HasConstraintName("FK__Answer__question__52593CB8");
         });
 
+        modelBuilder.Entity<ChatRoom>(entity =>
+        {
+            entity.HasKey(e => e.ChatId).HasName("PK__ChatRoom__A9FBE7C6442A35B0");
+
+            entity.ToTable("ChatRoom");
+
+            entity.Property(e => e.ChatId).HasMaxLength(36);
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UserId).HasMaxLength(36);
+
+            entity.HasOne(d => d.User).WithMany(p => p.ChatRooms)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ChatRoom_User");
+        });
+
+        modelBuilder.Entity<ChatRoomQuestion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ChatRoom__3214EC0728ECD044");
+
+            entity.ToTable("ChatRoomQuestion");
+
+            entity.Property(e => e.ChatId).HasMaxLength(36);
+            entity.Property(e => e.QuestionId).HasMaxLength(36);
+
+            entity.HasOne(d => d.Chat).WithMany(p => p.ChatRoomQuestions)
+                .HasForeignKey(d => d.ChatId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ChatRoomQuestion_ChatRoom");
+
+            entity.HasOne(d => d.Question).WithMany(p => p.ChatRoomQuestions)
+                .HasForeignKey(d => d.QuestionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ChatRoomQuestion_Question");
+        });
+
         modelBuilder.Entity<Question>(entity =>
         {
             entity.HasKey(e => e.QuestionId).HasName("PK__Question__2EC21549E2006468");
@@ -82,9 +123,6 @@ public partial class AichatbotDbContext : DbContext
             entity.Property(e => e.QuestionContent)
                 .HasMaxLength(4000)
                 .HasColumnName("question_content");
-            entity.Property(e => e.Embedding)
-                .HasMaxLength(4000)
-                .HasColumnName("embedding");
             entity.Property(e => e.UserId)
                 .HasMaxLength(36)
                 .HasColumnName("user_id");
@@ -109,6 +147,10 @@ public partial class AichatbotDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Image)
+                .HasMaxLength(255)
+                .HasColumnName("image");
+            entity.Property(e => e.Password).HasMaxLength(255);
             entity.Property(e => e.Role)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -124,13 +166,6 @@ public partial class AichatbotDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("user_status");
-            entity.Property(e => e.Password)
-                .HasMaxLength(255)
-                .IsUnicode(false)
-                .HasColumnName("password");
-            entity.Property(e => e.image)
-                .HasMaxLength(255)
-                .HasColumnName("image");
         });
 
         OnModelCreatingPartial(modelBuilder);

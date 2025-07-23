@@ -15,12 +15,14 @@ namespace Web_API.Controllers
         private readonly IQuestion _questionService;
         private readonly IEmbeddingService _embeddingService;
         private readonly IAnswerService _answerService;
+        private readonly IChatRoomService _chatRoomService;
 
-        public QuestionController(IQuestion questionService, IEmbeddingService embeddingService, IAnswerService answerService)
+        public QuestionController(IQuestion questionService, IEmbeddingService embeddingService, IAnswerService answerService, IChatRoomService chatRoomService)
         {
             _questionService = questionService;
             _embeddingService = embeddingService; // Assuming you have an EmbeddingService implementation
             _answerService = answerService;
+            _chatRoomService = chatRoomService;
         }
 
         [HttpGet("{id}")]
@@ -59,6 +61,11 @@ namespace Web_API.Controllers
             };
             _questionService.CreateQuestion(question);
             await _answerService.CreateAnswerFromQuestionAsync(question);
+
+            var chatRoom = _chatRoomService.GetOrCreateChatRoom(userId);
+
+            // 4. Thêm QuestionId vào ChatRoomQuestions
+            _chatRoomService.AddQuestionToChatRoom(chatRoom.ChatId, question.QuestionId.ToString());
             return CreatedAtAction(nameof(GetQuestionById), new { id = question.QuestionId }, question);
         }
 
@@ -70,6 +77,24 @@ namespace Web_API.Controllers
                 return NotFound("Question not found!");
             _questionService.DeleteQuestion(id);
             return Ok($"Question with ID: {id} deleted!");
+        }
+
+        [HttpGet("daily-history/{userId}")]
+        public async Task<IActionResult> GetUserDailyHistory(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required.");
+            }
+
+            var history = await _chatRoomService.GetUserDailyHistoryAsync(userId);
+
+            if (history == null || !history.Any())
+            {
+                return NotFound("No chat history found for today.");
+            }
+
+            return Ok(history);
         }
     }
 }

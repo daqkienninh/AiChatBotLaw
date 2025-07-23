@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Repositories.Models;
+using System;
 using System.Collections.Generic;
 
-namespace Repositories.Models;
+namespace Repositories;
 
 public partial class Question
 {
@@ -16,6 +17,8 @@ public partial class Question
     public string? Embedding { get; set; }
 
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
+
+    public virtual ICollection<ChatRoomQuestion> ChatRoomQuestions { get; set; } = new List<ChatRoomQuestion>();
 
     public virtual RegisteredUser? User { get; set; }
 }

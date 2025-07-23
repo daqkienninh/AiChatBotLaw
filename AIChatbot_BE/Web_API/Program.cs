@@ -20,6 +20,7 @@ builder.Services.AddScoped<IQuestion, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
 builder.Services.AddScoped<ILegalService, LegalService>();
+builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 

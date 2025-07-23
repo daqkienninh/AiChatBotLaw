@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
 using Services.Interface;
@@ -58,7 +59,7 @@ namespace Web_API.Controllers
                 UserName = dto.UserName,
                 UserEmail = dto.UserEmail,
                 Password = dto.Password,
-                image = dto.Image ?? null // Nếu Image là null, gán giá trị null
+                Image = dto.Image ?? null // Nếu Image là null, gán giá trị null
             };
             _registeredUserService.UpdateAccount(updatedUser);
             return Ok("Update Successfully!");
