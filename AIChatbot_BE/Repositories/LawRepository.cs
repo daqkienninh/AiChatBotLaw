@@ -25,7 +25,7 @@ namespace Repositories
             _settings = settings;
 
             var database = _mongoClient.GetDatabase(_settings.DatabaseName);
-            _bsonCollection = database.GetCollection<BsonDocument>("localLegalDocument");
+            _bsonCollection = database.GetCollection<BsonDocument>("LegalDocument");
         }
 
         /// <summary>
