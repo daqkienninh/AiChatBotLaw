@@ -10,5 +10,6 @@ namespace Repositories.Models
     {
         public string ApiKey { get; set; } = string.Empty;
         public string EmbeddingModel { get; set; } = "text-embedding-ada-002";
+        public string ChatModel { get; set; } = "ft:gpt-4o-mini:your-finetuned-model-id";
     }
 }

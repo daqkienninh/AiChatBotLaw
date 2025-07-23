@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using OpenAI;
+using OpenAI.GPT3;
+using OpenAI.GPT3.Interfaces;
+using OpenAI.GPT3.Managers;
 using Repositories;
 using Repositories.DBContext;
 using Repositories.Models;
@@ -11,6 +15,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using OpenAI.GPT3.ObjectModels.RequestModels;
+using OpenAI.GPT3.ObjectModels;
+
 
 namespace Services.Implement
 {
@@ -19,11 +26,18 @@ namespace Services.Implement
         private readonly AnswerRepository _answerRepository;
         private readonly MongoClient _mongoClient;
         private readonly MongoDbSettings _settings;
-        public AnswerService(IOptions<MongoDbSettings> settings) 
+        private readonly OpenAIOptions _openAiOptions;
+        private readonly IOpenAIService _openAIService;
+        public AnswerService(IOptions<MongoDbSettings> settings, IOptions<OpenAIOptions> openAiOptions) 
         { 
             _answerRepository = new AnswerRepository();
             _settings = settings.Value;
             _mongoClient = new MongoClient(_settings.ConnectionString);
+            _openAiOptions = openAiOptions.Value;
+            _openAIService = new OpenAIService(new OpenAiOptions
+        {
+            ApiKey = _openAiOptions.ApiKey
+        });
         }
 
         public async Task CreateAnswerFromQuestionAsync(Question question)
@@ -39,25 +53,60 @@ namespace Services.Implement
             var mongoDb = _mongoClient.GetDatabase(_settings.DatabaseName);
 
             // Tìm điều khoản phù hợp nhất
-            var (matchedClauseText, score, matchedClauseId) = await GetBestMatchClauseAsync(questionEmbedding, mongoDb);
+            var (matchedClauseText, score, matchedClauseId, clauseReference) = await GetBestMatchClauseAsync(questionEmbedding, mongoDb);
 
             const float threshold = 0.3f;
 
-            string generatedAnswer;
-            if (string.IsNullOrWhiteSpace(matchedClauseText) || score < threshold)
+            // Tạo prompt cho mô hình fine-tuned với trích dẫn cụ thể
+            string prompt = $"Bạn là một trợ lý pháp luật, trả lời chính xác dựa trên luật Việt Nam. Dựa trên câu hỏi: '{question.QuestionContent}'. ";
+            if (!string.IsNullOrWhiteSpace(matchedClauseText) && score >= threshold)
             {
-                generatedAnswer = "Hiện tại hệ thống chưa tìm được quy định pháp luật phù hợp với câu hỏi.";
+                prompt += $"Trích dẫn pháp luật: '{clauseReference}' - Nội dung: '{matchedClauseText}'. Hãy trả lời tự nhiên và trích dẫn điều khoản hoặc điểm cụ thể khi phù hợp.";
             }
             else
             {
-                generatedAnswer = $"Theo quy định pháp luật: {matchedClauseText}";
+                prompt += "Hiện tại không có quy định pháp luật phù hợp. Hãy trả lời một cách tổng quát và hữu ích.";
             }
+
+            // Gọi mô hình fine-tuned để tạo câu trả lời
+            var completionRequest = new ChatCompletionCreateRequest
+            {
+                Model = _openAiOptions.ChatModel, // Sử dụng mô hình fine-tuned
+                Messages = new List<ChatMessage>
+            {
+                ChatMessage.FromSystem(prompt),
+                ChatMessage.FromUser(question.QuestionContent)
+            },
+                Temperature = 0.2f,
+                MaxTokens = 512
+            };
+
+            string generatedAnswer;
+            try
+            {
+                var completionResult = await _openAIService.ChatCompletion.CreateCompletion(completionRequest);
+                if (completionResult == null || completionResult.Choices == null || !completionResult.Choices.Any())
+                {
+                    generatedAnswer = "Hiện tại hệ thống chưa tìm được quy định pháp luật phù hợp với câu hỏi.";
+                }
+                else
+                {
+                    generatedAnswer = completionResult.Choices.First().Message.Content?.Trim() ??
+                                    "Hiện tại hệ thống chưa tìm được quy định pháp luật phù hợp với câu hỏi.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi gọi API OpenAI: {ex.Message}");
+                generatedAnswer = "Xin lỗi, hệ thống gặp sự cố khi tạo câu trả lời.";
+            }
+
             // Ghi vào SQL
             var answer = new Answer
             {
-                AnswerId = question.QuestionId,
+                AnswerId = question.QuestionId, // Tạo ID mới cho câu trả lời
                 QuestionId = question.QuestionId,
-                AnsContent = generatedAnswer,
+                AnsContent = generatedAnswer + "Trích " + clauseReference,
                 LegalclauseId = matchedClauseId,
                 AnsCreateAt = DateTime.Now
             };
@@ -65,12 +114,32 @@ namespace Services.Implement
             _answerRepository.AddAnswer(answer);
         }
 
-        private async Task<(string bestText, float bestScore, string bestId)> GetBestMatchClauseAsync(List<float> questionEmbedding, IMongoDatabase mongoDb)
+
+        private float CosineSimilarity(List<float> vector1, List<float> vector2)
+        {
+            if (vector1.Count != vector2.Count) return 0f;
+
+            float dotProduct = 0f, magnitude1 = 0f, magnitude2 = 0f;
+            for (int i = 0; i < vector1.Count; i++)
+            {
+                dotProduct += vector1[i] * vector2[i];
+                magnitude1 += vector1[i] * vector1[i];
+                magnitude2 += vector2[i] * vector2[i];
+            }
+
+            magnitude1 = (float)Math.Sqrt(magnitude1);
+            magnitude2 = (float)Math.Sqrt(magnitude2);
+
+            return magnitude1 == 0 || magnitude2 == 0 ? 0f : dotProduct / (magnitude1 * magnitude2);
+        }
+
+        private async Task<(string matchedClauseText, float score, string matchedClauseId, string clauseReference)> GetBestMatchClauseAsync(List<float> questionEmbedding, IMongoDatabase mongoDb)
         {
             var clauseCollection = mongoDb.GetCollection<BsonDocument>("LegalDocument");
             float bestScore = -1f;
-            string bestText = "";
-            string bestId = "";
+            string matchedClauseText = null;
+            string matchedClauseId = null;
+            string clauseReference = null;
 
             var documents = await clauseCollection.Find(Builders<BsonDocument>.Filter.Empty).ToListAsync();
 
@@ -78,20 +147,22 @@ namespace Services.Implement
             {
                 if (!doc.Contains("articles")) continue;
 
-                foreach (var article in doc["articles"].AsBsonArray)
+                var articles = doc["articles"].AsBsonArray;
+                foreach (var article in articles)
                 {
                     var articleDoc = article.AsBsonDocument;
 
-                    // === Ưu tiên 1: ĐIỂM ===
+                    // Ưu tiên 1: ĐIỂM
                     if (articleDoc.Contains("clauses"))
                     {
-                        foreach (var clause in articleDoc["clauses"].AsBsonArray)
+                        var clausesinDoc = articleDoc["clauses"].AsBsonArray;
+                        foreach (var clause in clausesinDoc)
                         {
                             var clauseDoc = clause.AsBsonDocument;
-
                             if (clauseDoc.Contains("points"))
                             {
-                                foreach (var point in clauseDoc["points"].AsBsonArray)
+                                var points = clauseDoc["points"].AsBsonArray;
+                                foreach (var point in points)
                                 {
                                     var pointDoc = point.AsBsonDocument;
                                     if (pointDoc.Contains("embedding") && pointDoc.Contains("text") && pointDoc.Contains("id"))
@@ -102,8 +173,9 @@ namespace Services.Implement
                                         if (score > bestScore)
                                         {
                                             bestScore = score;
-                                            bestText = pointDoc["text"].AsString;
-                                            bestId = pointDoc["id"].AsString;
+                                            matchedClauseText = pointDoc["text"].AsString;
+                                            matchedClauseId = pointDoc["id"].AsString;
+                                            clauseReference = ConstructReference(articleDoc, clauseDoc, pointDoc); // Trích dẫn đầy đủ
                                         }
                                     }
                                 }
@@ -111,8 +183,9 @@ namespace Services.Implement
                         }
                     }
 
-                    // === Ưu tiên 2: KHOẢN ===
-                    foreach (var clause in articleDoc.GetValue("clauses", new BsonArray()).AsBsonArray)
+                    // Ưu tiên 2: KHOẢN
+                    var clauses = articleDoc.GetValue("clauses", new BsonArray()).AsBsonArray;
+                    foreach (var clause in clauses)
                     {
                         var clauseDoc = clause.AsBsonDocument;
                         if (clauseDoc.Contains("embedding") && clauseDoc.Contains("text") && clauseDoc.Contains("id"))
@@ -123,13 +196,14 @@ namespace Services.Implement
                             if (score > bestScore)
                             {
                                 bestScore = score;
-                                bestText = clauseDoc["text"].AsString;
-                                bestId = clauseDoc["id"].AsString;
+                                matchedClauseText = clauseDoc["text"].AsString;
+                                matchedClauseId = clauseDoc["id"].AsString;
+                                clauseReference = ConstructReference(articleDoc, clauseDoc); // Trích dẫn đầy đủ
                             }
                         }
                     }
 
-                    // === Ưu tiên 3: ĐIỀU ===
+                    // Ưu tiên 3: ĐIỀU
                     if (articleDoc.Contains("embedding") && articleDoc.Contains("title") && articleDoc.Contains("id"))
                     {
                         var embedding = articleDoc["embedding"].AsBsonArray.Select(x => (float)x.AsDouble).ToList();
@@ -138,14 +212,52 @@ namespace Services.Implement
                         if (score > bestScore)
                         {
                             bestScore = score;
-                            bestText = articleDoc["title"].AsString;
-                            bestId = articleDoc["id"].AsString;
+                            matchedClauseText = articleDoc["title"].AsString;
+                            matchedClauseId = articleDoc["id"].AsString;
+                            clauseReference = ConstructReference(articleDoc); // Trích dẫn chỉ Điều
                         }
                     }
                 }
             }
 
-            return (bestText, bestScore, bestId);
+            return (matchedClauseText, bestScore, matchedClauseId, clauseReference ?? "");
+        }
+
+        private string ConstructReference(BsonDocument articleDoc, BsonDocument clauseDoc = null, BsonDocument pointDoc = null)
+        {
+            var referenceParts = new List<string>();
+
+            // Thêm Điều (từ articleDoc)
+            if (articleDoc.Contains("type"))
+            {
+                var title = articleDoc["id"].AsString.Trim();
+                if (!string.IsNullOrEmpty(title))
+                {
+                    referenceParts.Add($"Điều {title}"); // Ví dụ: "Điều 1"
+                }
+            }
+
+            // Thêm Khoản (từ clauseDoc)
+            if (clauseDoc != null && clauseDoc.Contains("id"))
+            {
+                var clauseText = clauseDoc["id"].AsString.Trim();
+                if (!string.IsNullOrEmpty(clauseText))
+                {
+                    referenceParts.Add($"Khoản {clauseText}"); // Ví dụ: "Khoản 1"
+                }
+            }
+
+            // Thêm Điểm (từ pointDoc)
+            if (pointDoc != null && pointDoc.Contains("id"))
+            {
+                var pointText = pointDoc["id"].AsString.Trim();
+                if (!string.IsNullOrEmpty(pointText))
+                {
+                    referenceParts.Add($"Điểm {pointText}");
+                }
+            }
+
+            return string.Join(", ", referenceParts.Where(p => !string.IsNullOrEmpty(p)));
         }
 
 
@@ -166,31 +278,6 @@ namespace Services.Implement
         private class EmbeddingWrapper
         {
             public List<float> Result { get; set; }
-        }
-
-
-
-        private float CosineSimilarity(List<float> a, List<float> b)
-        {
-            if (a == null || b == null || a.Count == 0 || b.Count == 0)
-                return -1f;
-
-            if (a.Count != b.Count)
-            {
-                Console.WriteLine($"⚠️ Length mismatch: a = {a.Count}, b = {b.Count}");
-                return -1f; // hoặc return 0f nếu muốn bỏ qua
-            }
-
-            float dot = 0f, normA = 0f, normB = 0f;
-
-            for (int i = 0; i < a.Count; i++)
-            {
-                dot += a[i] * b[i];
-                normA += a[i] * a[i];
-                normB += b[i] * b[i];
-            }
-
-            return (float)(dot / (Math.Sqrt(normA) * Math.Sqrt(normB) + 1e-10)); // Tránh chia 0
         }
 
         public Answer GetAnswerById(string answerId)
