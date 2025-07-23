@@ -86,9 +86,9 @@ namespace Repositories
             }
 
             // Cập nhật Image nếu có
-            if(!string.IsNullOrWhiteSpace(updatedUser.image))
+            if(!string.IsNullOrWhiteSpace(updatedUser.Image))
             {
-                account.image = updatedUser.image;
+                account.Image = updatedUser.Image;
             }
 
             // (Không thay đổi Role, Status, CreatedAt nếu không cần)

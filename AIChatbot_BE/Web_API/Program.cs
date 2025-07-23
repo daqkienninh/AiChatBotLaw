@@ -22,6 +22,7 @@ builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
 builder.Services.AddScoped<INotification, NotificationService>();
 
 builder.Services.AddScoped<ILegalService, LegalService>();
+builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 
