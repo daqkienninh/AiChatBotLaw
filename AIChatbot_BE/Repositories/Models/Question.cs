@@ -19,6 +19,4 @@ public partial class Question
     public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
     public virtual ICollection<ChatRoomQuestion> ChatRoomQuestions { get; set; } = new List<ChatRoomQuestion>();
-
-    public virtual RegisteredUser? User { get; set; }
 }

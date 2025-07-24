@@ -11,11 +11,11 @@ namespace Repositories
 {
     public class QuestionRepository
     {
-        private readonly AichatbotDbContext dbContext;
+        private readonly TestDbContext dbContext;
 
         public QuestionRepository()
         {
-            dbContext = new AichatbotDbContext();
+            dbContext = new();
         }
 
         public void CreateQuestion(Question question)
@@ -63,14 +63,7 @@ namespace Repositories
 
             return dbContext.Questions
                 .Include(q => q.Answers)
-                .Include(q => q.User)
                 .FirstOrDefault(q => q.QuestionId == questionId);
-        }
-
-        //hàm kiểm tra user có tồn tại hay không
-        public bool UserExists(string userId)
-        {
-            return dbContext.RegisteredUsers.Any(u => u.UserId == userId);
         }
     }
 }

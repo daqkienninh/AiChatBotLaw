@@ -1,8 +1,7 @@
-﻿using Repositories.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Repositories;
+namespace Repositories.Models;
 
 public partial class ChatRoom
 {
@@ -13,6 +12,4 @@ public partial class ChatRoom
     public DateTime? CreatedAt { get; set; }
 
     public virtual ICollection<ChatRoomQuestion> ChatRoomQuestions { get; set; } = new List<ChatRoomQuestion>();
-
-    public virtual RegisteredUser User { get; set; } = null!;
 }

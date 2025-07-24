@@ -11,10 +11,10 @@ namespace Repositories
 {
     public class ChatRoomRepository
     {
-        private readonly AichatbotDbContext dbContext;
+        private readonly TestDbContext dbContext;
         public ChatRoomRepository()
         {
-            dbContext = new AichatbotDbContext();
+            dbContext = new();
         }
         public ChatRoom GetOrCreateChatRoom(string userId)
         {
@@ -27,7 +27,7 @@ namespace Repositories
             {
                 chatRoom = new ChatRoom
                 {
-                    ChatId = Guid.NewGuid().ToString(),
+                    ChatId = Guid.NewGuid().ToString(), // Generate a new unique ChatId
                     UserId = userId,
                     CreatedAt = today
                 };

@@ -8,6 +8,9 @@ using Services.Implement;
 using Services.Interface;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,18 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddScoped<IRegisteredUser, RegisteredUserService>();
 builder.Services.AddScoped<IQuestion, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IEmbeddingService, OpenAIEmbeddingService>();
-builder.Services.AddScoped<INotification, NotificationService>();
 
 builder.Services.AddScoped<ILegalService, LegalService>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 
 builder.Services.Configure<OpenAIOptions>(builder.Configuration.GetSection("OpenAI"));
 
-builder.Services.AddDbContext<Repositories.DBContext.AichatbotDbContext>(options =>
+builder.Services.AddDbContext<Repositories.DBContext.TestDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AIChatbotDB")));
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
@@ -55,18 +56,18 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddSingleton<LawRepository>();
 
 //add google login service
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-})
-    .AddCookie()
-    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-    {
-       options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-       options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
-       options.CallbackPath = "/api/GoogleAuthenticate/GoogleResponse";
-    });
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//})
+//    .AddCookie()
+//    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+//    {
+//       options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+//       options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+//       options.CallbackPath = "/api/GoogleAuthenticate/GoogleResponse";
+//    });
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -83,6 +84,22 @@ builder.Services.AddCors(options =>
             .AllowCredentials(); // Optional, if credentials are needed
     });
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:KeyFromNodejs"]);
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key), // same key Node.js used to sign token
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType = "role"
+        };
+    });
 
 var app = builder.Build();
 var environment = app.Environment;
@@ -106,40 +123,6 @@ if (environment.IsDevelopment() || environment.IsProduction())
 }
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5171";
 app.Urls.Add($"http://0.0.0.0:{port}");
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var config = services.GetRequiredService<IConfiguration>();
-    var dbContext = services.GetRequiredService<AichatbotDbContext>();
-
-    // Bind từ appsettings.json
-    var adminSection = config.GetSection("AdminAccount");
-    var adminConfig = adminSection.Get<AdminAccountConfig>();
-
-    // Kiểm tra xem admin đã tồn tại chưa
-    if (!dbContext.RegisteredUsers.Any(u => u.UserEmail == adminConfig.Email))
-    {
-        var admin = new RegisteredUser
-        {
-            UserId = Guid.NewGuid().ToString(),
-            UserEmail = adminConfig.Email,
-            Password = BCrypt.Net.BCrypt.HashPassword(adminConfig.Password),
-            UserName = adminConfig.Name,
-            Role = adminConfig.Role,
-            UserStatus = adminConfig.Status,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        dbContext.RegisteredUsers.Add(admin);
-        dbContext.SaveChanges();
-        Console.WriteLine("Admin account created!");
-    }
-    else
-    {
-        Console.WriteLine("Admin account already exists!");
-    }
-}
 
 
 // Configure the HTTP request pipeline.

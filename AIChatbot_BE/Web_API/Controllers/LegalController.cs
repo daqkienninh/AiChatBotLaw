@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -21,6 +22,7 @@ namespace Web_API.Controllers
         }
 
         [HttpPost("upload")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -32,6 +34,7 @@ namespace Web_API.Controllers
         }
 
         [HttpPut("Chapter")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateClause([FromBody] UpdateClauseDTO dto)
         {
             var success = await _legalService.UpdateClauseAsync(
@@ -47,6 +50,12 @@ namespace Web_API.Controllers
             else
                 return BadRequest(new { message = "Không có gì được cập nhật hoặc lỗi." });
         }
-    
+        [HttpGet]
+        public async Task<IActionResult> GetAllChapters()
+        {
+            var chapters = await _legalService.GetAllLegalChapter();
+            return Ok(chapters);
+        }
+
     }
 }

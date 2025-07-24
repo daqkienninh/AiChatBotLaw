@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Repositories.Models;
 using Services.Implement;
@@ -24,14 +25,13 @@ namespace Web_API.Controllers
             _answerService = answerService;
             _chatRoomService = chatRoomService;
         }
-
         [HttpGet("{id}")]
-        public IActionResult GetQuestionById(string id)
+        public ActionResult<QuestionDTO> GetQuestionById(string id)
         {
             var question = _questionService.GetQuestionById(id);
 
             if (question == null)
-                return NotFound($"Question with ID: {id} is deleted or not existed!");
+                return null;
 
             var dto = new QuestionDTO
             {
@@ -44,6 +44,7 @@ namespace Web_API.Controllers
         }
 
         [HttpPost]
+        //[Authorize]
         public async Task<IActionResult> CreateQuestion(string userId, [FromBody] string questionContent)
         {
             if (questionContent == null)
@@ -68,18 +69,8 @@ namespace Web_API.Controllers
             _chatRoomService.AddQuestionToChatRoom(chatRoom.ChatId, question.QuestionId.ToString());
             return CreatedAtAction(nameof(GetQuestionById), new { id = question.QuestionId }, question);
         }
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteQuestion(string id)
-        {
-            var existingQuestion = _questionService.GetQuestionById(id);
-            if (existingQuestion == null)
-                return NotFound("Question not found!");
-            _questionService.DeleteQuestion(id);
-            return Ok($"Question with ID: {id} deleted!");
-        }
-
         [HttpGet("daily-history/{userId}")]
+        //[Authorize]
         public async Task<IActionResult> GetUserDailyHistory(string userId)
         {
             if (string.IsNullOrEmpty(userId))

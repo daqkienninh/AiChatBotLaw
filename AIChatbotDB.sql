@@ -1,25 +1,10 @@
-﻿create database AIChatbotDB
-use AIChatbotDB
-
--- Bảng lưu thông tin người dùng đã đăng ký
-CREATE TABLE Registered_user (
-    user_id NVARCHAR(36) PRIMARY KEY,        -- UUID
-    user_name NVARCHAR(100) NOT NULL,
-    user_email VARCHAR(100) NOT NULL UNIQUE,
-	Password NVARCHAR(255),
-	image VARCHAR(255),
-    user_status VARCHAR(50),             -- active / inactive / banned
-    role VARCHAR(50),                    -- admin / user / moderator
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
+﻿
 -- Bảng lưu câu hỏi của người dùng
 CREATE TABLE Question (
     question_id NVARCHAR(36) PRIMARY KEY,    -- UUID
     user_id NVARCHAR(36),
     question_content NVARCHAR (4000) NOT NULL,
     ques_create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Registered_user(user_id)
 );
 
 -- Bảng lưu câu trả lời
@@ -35,22 +20,17 @@ CREATE TABLE Answer (
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
 
-INSERT INTO Registered_user (user_id, user_name, user_email, password, user_status, role)
-VALUES (
-    'USR005', 
-    'Alice', 
-    'alice@example.com', 
-    'Alice123', 
-    'active', 
-    'user'
+CREATE TABLE ChatRoom (
+    ChatId NVARCHAR(36) PRIMARY KEY,
+    UserId NVARCHAR(36) NOT NULL,
+    CreatedAt DATETIME,
+);
+CREATE TABLE ChatRoomQuestion (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    ChatId NVARCHAR(36) NOT NULL,
+    QuestionId NVARCHAR(36) NOT NULL,
+    FOREIGN KEY (ChatId) REFERENCES ChatRoom(ChatId) ON DELETE NO ACTION,
+    FOREIGN KEY (QuestionId) REFERENCES Question(question_id) ON DELETE NO ACTION
 );
 
--- tạo table notification
-CREATE TABLE Notification (
-    notification_id NVARCHAR(36) PRIMARY KEY,
-    notification_title NVARCHAR(255),
-    notification_content NVARCHAR(MAX),
-    notification_created_at DATETIME,
-    is_global BIT DEFAULT 1 -- cái này dùng để định dạng thông báo này là thông báo chung cho tất cả user
-);
 

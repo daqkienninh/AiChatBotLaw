@@ -10,10 +10,10 @@ namespace Repositories
 {
     public class AnswerRepository
     {
-        private readonly AichatbotDbContext _context;
+        private readonly TestDbContext _context;
         public AnswerRepository()
         {
-            _context = new AichatbotDbContext();
+            _context = new();
         }
         
         public void AddAnswer(Answer answer)
