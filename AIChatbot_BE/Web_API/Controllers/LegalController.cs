@@ -21,8 +21,7 @@ namespace Web_API.Controllers
             _env = env;
         }
 
-        [HttpPost("upload")]
-        [Authorize(Roles = "admin")]
+            [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -34,7 +33,6 @@ namespace Web_API.Controllers
         }
 
         [HttpPut("Chapter")]
-        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateClause([FromBody] UpdateClauseDTO dto)
         {
             var success = await _legalService.UpdateClauseAsync(
