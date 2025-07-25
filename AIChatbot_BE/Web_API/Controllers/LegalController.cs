@@ -28,6 +28,8 @@ namespace Web_API.Controllers
                 return BadRequest("No file uploaded.");
 
             var result = await _legalService.ProcessPdfAsync(file);
+            if (result.Inserted == 0 && result.Updated == 0 && result.Skipped == 0)
+                return BadRequest("Error processing the file.");
 
             return Ok(new { inserted = result.Inserted, updated = result.Updated, skipped = result.Skipped });
         }
