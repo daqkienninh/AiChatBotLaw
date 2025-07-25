@@ -112,7 +112,7 @@ namespace Repositories
                         };
 
                         // Nếu có clauseItems trong điều
-                        if (articleDoc.TryGetValue("clauseItems", out var clauseItemsBson) && clauseItemsBson.IsBsonArray)
+                        if (articleDoc.TryGetValue("clauses", out var clauseItemsBson) && clauseItemsBson.IsBsonArray)
                         {
                             foreach (var itemBson in clauseItemsBson.AsBsonArray)
                             {
