@@ -45,7 +45,10 @@ namespace Services.Implement
             if (string.IsNullOrWhiteSpace(question.QuestionContent))
                 throw new ArgumentException("Question content is empty.");
 
-            var questionEmbedding = ParseEmbedding(question.Embedding);
+            var questionEmbedding = string.IsNullOrWhiteSpace(question.Embedding)
+                ? new List<float>()
+                : JsonSerializer.Deserialize<List<float>>(question.Embedding) ?? new List<float>();
+
             if (questionEmbedding.Count == 0)
                 throw new InvalidOperationException("Question embedding is missing or invalid.");
 

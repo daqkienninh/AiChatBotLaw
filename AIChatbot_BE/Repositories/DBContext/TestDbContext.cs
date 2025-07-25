@@ -121,6 +121,8 @@ public partial class TestDbContext : DbContext
             entity.Property(e => e.UserId)
                 .HasMaxLength(36)
                 .HasColumnName("user_id");
+            entity.Property(e => e.Embedding)
+                .HasColumnName("embedding");
         });
 
         OnModelCreatingPartial(modelBuilder);

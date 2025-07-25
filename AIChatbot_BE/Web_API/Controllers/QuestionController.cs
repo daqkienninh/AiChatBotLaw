@@ -51,7 +51,7 @@ namespace Web_API.Controllers
             {
                 return BadRequest("Invalid question data!");
             }
-            var embedding = _embeddingService.GenerateEmbeddingAsync(questionContent);
+            var embedding = await _embeddingService.GenerateEmbeddingAsync(questionContent);
 
             var question = new Question
             {

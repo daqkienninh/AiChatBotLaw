@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenAI.Embeddings;
+using System;
 using System.Collections.Generic;
 
 namespace Repositories.Models;
